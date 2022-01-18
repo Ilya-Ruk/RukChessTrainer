@@ -34,11 +34,11 @@ void LoadDataEntry(char* buffer, Board* result) {
   result->stm = strstr(buffer, "w ") ? WHITE : BLACK;
   ParseFen(buffer, result);
 
-  if (strstr(buffer, "[1.0]"))
+  if (strstr(buffer, "|1.0"))
     result->wdl = 2;
-  else if (strstr(buffer, "[0.5]"))
+  else if (strstr(buffer, "|0.5"))
     result->wdl = 1;
-  else if (strstr(buffer, "[0.0]"))
+  else if (strstr(buffer, "|0.0"))
     result->wdl = 0;
   else {
     printf("Cannot parse entry: %s!\n", buffer);

@@ -11,4 +11,8 @@ INLINE float Error(float r, Board* b) { return powf(fabs(r - b->wdl / 2.0f), 2.5
 
 INLINE float ErrorGradient(float r, Board* b) { return 2.5f * (r - b->wdl / 2.0f) * sqrtf(fabs(r - b->wdl / 2.0f)); }
 
+//INLINE float Error(float r, Board* b) { return powf(r - b->wdl / 2.0f, 2.0f); }
+
+//INLINE float ErrorGradient(float r, Board* b) { return 2.0f * (r - b->wdl / 2.0f); }
+
 #endif

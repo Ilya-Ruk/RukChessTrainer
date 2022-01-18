@@ -45,7 +45,7 @@ void ParseFen(char* fen, Board* board) {
         board->kings[BLACK] = sq;
 
       setBit(board->occupancies, sq);
-      board->pieces[n / 2] |= pc << ((n & 1) * 4);
+      board->pieces[n / 2] |= pc << ((n & 1) << 2);
 
       n++;
     } else if (c >= '1' && c <= '8')

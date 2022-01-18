@@ -32,7 +32,7 @@ void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results) {
   ReLU(results->acc1[BLACK], N_HIDDEN);
 
   results->output += DotProduct(results->acc1[stm], nn->outputWeights, N_HIDDEN) +
-                     DotProduct(results->acc1[stm ^ 1], nn->outputWeights + N_HIDDEN, N_HIDDEN) +  //
+                     DotProduct(results->acc1[stm ^ 1], nn->outputWeights + N_HIDDEN, N_HIDDEN) +
                      nn->outputBias;
 }
 
@@ -53,7 +53,7 @@ NN* LoadNN(char* path) {
 
   uint64_t hash;
   fread(&hash, sizeof(uint64_t), 1, fp);
-  printf("Reading network with hash %llx\n", hash);
+  printf("Reading network with hash %lx\n", hash);
 
   NN* nn = AlignedMalloc(sizeof(NN));
 

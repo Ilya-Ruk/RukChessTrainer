@@ -23,18 +23,6 @@ INLINE void ReLU(float* v, const size_t n) {
   for (size_t j = 0; j < chunks; j++) vector[j] = _mm256_max_ps(zero, vector[j]);
 }
 
-INLINE void CReLU(float* v, const size_t n) {
-  const size_t width = sizeof(__m256) / sizeof(float);
-  const size_t chunks = n / width;
-
-  const __m256 zero = _mm256_setzero_ps();
-  const __m256 max = _mm256_set1_ps(CRELU_MAX);
-
-  __m256* vector = (__m256*)v;
-
-  for (size_t j = 0; j < chunks; j++) vector[j] = _mm256_min_ps(max, _mm256_max_ps(zero, vector[j]));
-}
-
 INLINE float DotProduct(float* v1, float* v2, const size_t n) {
   const size_t width = sizeof(__m256) / sizeof(float);
   const size_t chunks = n / width;
@@ -54,6 +42,7 @@ INLINE float DotProduct(float* v1, float* v2, const size_t n) {
   const __m128 r4 = _mm_add_ps(_mm256_castps256_ps128(r8), _mm256_extractf128_ps(r8, 1));
   const __m128 r2 = _mm_add_ps(r4, _mm_movehl_ps(r4, r4));
   const __m128 r1 = _mm_add_ss(r2, _mm_shuffle_ps(r2, r2, 0x1));
+
   return _mm_cvtss_f32(r1);
 }
 

@@ -1,6 +1,7 @@
 #include "trainer.h"
 
 #include <math.h>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -19,23 +20,32 @@ int main(int argc, char** argv) {
   int c;
 
   char nnPath[128] = {0};
-  char entriesPath[128] = {0};
+  char validPath[128] = {0};
+  char trainPath[128] = {0};
 
-  while ((c = getopt(argc, argv, "d:n:")) != -1) {
+  while ((c = getopt(argc, argv, "n:v:t:")) != -1) {
     switch (c) {
-      case 'd':
-        strcpy(entriesPath, optarg);
-        break;
       case 'n':
         strcpy(nnPath, optarg);
+        break;
+      case 'v':
+        strcpy(validPath, optarg);
+        break;
+      case 't':
+        strcpy(trainPath, optarg);
         break;
       case '?':
         return 1;
     }
   }
 
-  if (!entriesPath[0]) {
-    printf("No data file specified!\n");
+  if (!validPath[0]) {
+    printf("No valid data file specified!\n");
+    return 1;
+  }
+
+  if (!trainPath[0]) {
+    printf("No train data file specified!\n");
     return 1;
   }
 
@@ -48,17 +58,19 @@ int main(int argc, char** argv) {
     nn = LoadNN(nnPath);
   }
 
-  printf("Loading entries from %s\n", entriesPath);
+  printf("Loading valid data from %s\n", validPath);
 
   DataSet* validation = malloc(sizeof(DataSet));
   validation->n = 0;
-  validation->entries = malloc(sizeof(Board) * VALIDATION_POSITIONS);
-  LoadEntries(entriesPath, validation, VALIDATION_POSITIONS, 0);
+  validation->entries = malloc(sizeof(Board) * MAX_VALID_POSITIONS);
+  LoadEntries(validPath, validation, MAX_VALID_POSITIONS, 0);
+
+  printf("Loading train data from %s\n", trainPath);
 
   DataSet* data = malloc(sizeof(DataSet));
   data->n = 0;
-  data->entries = malloc(sizeof(Board) * MAX_POSITIONS);
-  LoadEntries(entriesPath, data, MAX_POSITIONS, VALIDATION_POSITIONS);
+  data->entries = malloc(sizeof(Board) * MAX_TRAIN_POSITIONS);
+  LoadEntries(trainPath, data, MAX_TRAIN_POSITIONS, 0);
 
   NNGradients* gradients = malloc(sizeof(NNGradients));
   ClearGradients(gradients);
@@ -74,11 +86,12 @@ int main(int argc, char** argv) {
 
     printf("Shuffling...\n");
     ShuffleData(data);
+	printf("Shuffling...DONE\n");
 
     int batches = data->n / BATCH_SIZE;
     for (int b = 0; b < batches; b++) {
       Train(b, data, nn, gradients, local);
-      ApplyGradients(nn, gradients);
+      ApplyGradients(nn, gradients, epoch);
 
       if ((b + 1) % 1000 == 0) printf("Batch: [#%d/%d]\n", b + 1, batches);
     }
@@ -156,34 +169,34 @@ void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradients* loc
 
     // INPUT LAYER GRADIENTS --------------------------------------------------------------------
     for (int i = 0; i < N_HIDDEN; i++) {
-      float stmLasso = LAMBDA * (activations->acc1[board.stm][i] > 0);
-      float xstmLasso = LAMBDA * (activations->acc1[board.stm ^ 1][i] > 0);
+//      float stmLasso = LAMBDA * (activations->acc1[board.stm][i] > 0);
+//      float xstmLasso = LAMBDA * (activations->acc1[board.stm ^ 1][i] > 0);
 
-      local[t].inputBiases[i] += hiddenLosses[board.stm][i] + hiddenLosses[board.stm ^ 1][i] + stmLasso + xstmLasso;
+      local[t].inputBiases[i] += hiddenLosses[board.stm][i] + hiddenLosses[board.stm ^ 1][i]/* + stmLasso + xstmLasso*/;
     }
 
     for (int i = 0; i < f->n; i++) {
       for (int j = 0; j < N_HIDDEN; j++) {
-        float stmLasso = LAMBDA * (activations->acc1[board.stm][j] > 0);
-        float xstmLasso = LAMBDA * (activations->acc1[board.stm ^ 1][j] > 0);
+//        float stmLasso = LAMBDA * (activations->acc1[board.stm][j] > 0);
+//        float xstmLasso = LAMBDA * (activations->acc1[board.stm ^ 1][j] > 0);
 
-        local[t].inputWeights[f->features[board.stm][i] * N_HIDDEN + j] += hiddenLosses[board.stm][j] + stmLasso;
+        local[t].inputWeights[f->features[board.stm][i] * N_HIDDEN + j] += hiddenLosses[board.stm][j]/* + stmLasso*/;
         local[t].inputWeights[f->features[board.stm ^ 1][i] * N_HIDDEN + j] +=
-            hiddenLosses[board.stm ^ 1][j] + xstmLasso;
+            hiddenLosses[board.stm ^ 1][j]/* + xstmLasso*/;
       }
     }
     // ------------------------------------------------------------------------------------------
   }
 
-#pragma omp parallel for schedule(auto) num_threads(4)
+#pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int i = 0; i < N_INPUT * N_HIDDEN; i++)
     for (int t = 0; t < THREADS; t++) g->inputWeights[i].g += local[t].inputWeights[i];
 
-#pragma omp parallel for schedule(auto) num_threads(2)
+#pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int i = 0; i < N_HIDDEN; i++)
     for (int t = 0; t < THREADS; t++) g->inputBiases[i].g += local[t].inputBiases[i];
 
-#pragma omp parallel for schedule(auto) num_threads(2)
+#pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int i = 0; i < N_HIDDEN * 2; i++)
     for (int t = 0; t < THREADS; t++) g->outputWeights[i].g += local[t].outputWeights[i];
 

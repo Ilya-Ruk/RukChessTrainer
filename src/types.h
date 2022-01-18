@@ -8,20 +8,18 @@
 #define N_HIDDEN 512
 #define N_OUTPUT 1
 
-#define THREADS 16
+#define THREADS 12
 #define BATCH_SIZE 16384
 
-#define ALPHA 0.01f
-#define BETA1 0.95f
+#define ALPHA 0.005f
+#define BETA1 0.9f
 #define BETA2 0.999f
 #define EPSILON 1e-8f
 
-#define LAMBDA (1.0 / (1024 * 1024))
+//#define LAMBDA (1.0 / (1024 * 1024))
 
-#define MAX_POSITIONS 1750000000
-#define VALIDATION_POSITIONS 10000000
-
-#define CRELU_MAX 256
+#define MAX_VALID_POSITIONS 60000000
+#define MAX_TRAIN_POSITIONS 500000000
 
 enum {
   WHITE_PAWN,
@@ -46,11 +44,12 @@ typedef uint8_t Piece;
 typedef uint16_t Feature;
 
 typedef struct {
-  Color stm, wdl;
+  Color stm;
+  uint8_t wdl;
   Square kings[2];
   uint64_t occupancies;
   uint8_t pieces[16];
-} Board;
+} Board; // 28 (32) bytes
 
 typedef struct {
   int8_t n;
@@ -95,10 +94,10 @@ typedef struct {
   float inputWeights[N_INPUT * N_HIDDEN];
 } BatchGradients;
 
-extern const Square psqt[];
-extern const Piece charToPiece[];
-extern const Piece opposite[];
-extern const int8_t scalar[];
 extern const float SS;
+
+extern const Piece charToPiece[];
+extern const Piece opposite[12];
+extern const Square psqt[64];
 
 #endif
