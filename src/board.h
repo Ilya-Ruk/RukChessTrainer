@@ -10,9 +10,9 @@ INLINE Piece inv(Piece p) { return opposite[p]; }
 
 INLINE Feature idx(Piece pc, Square sq, Square king, const Color view) {
   if (view == WHITE)
-    return (pc << 6) + (kIdx(king, sq) << 5) + psqt[sq];
+    return (pc << 6) + sq;
   else
-    return (inv(pc) << 6) + (kIdx(king, sq) << 5) + psqt[sq ^ 56];
+    return (inv(pc) << 6) + (sq ^ 56);
 }
 
 INLINE Piece getPiece(uint8_t pieces[16], int n) { return (pieces[n / 2] >> ((n & 1) << 2)) & 0xF; }
