@@ -12,12 +12,12 @@ void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch) {
   grad->M = BETA1 * grad->M + (1.0 - BETA1) * grad->g;
   grad->V = BETA2 * grad->V + (1.0 - BETA2) * grad->g * grad->g;
 
+//  float delta = ALPHA * grad->M / (sqrtf(grad->V) + EPSILON);
+
   float M_Corrected = grad->M / (1.0 - powf(BETA1, Epoch));
   float V_Corrected = grad->V / (1.0 - powf(BETA2, Epoch));
 
   float delta = ALPHA * M_Corrected / (sqrtf(V_Corrected) + EPSILON);
-
-//  float delta = ALPHA * grad->M / (sqrtf(grad->V) + EPSILON);
 
   *v -= delta;
 
