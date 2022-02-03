@@ -4,7 +4,7 @@
 #include "types.h"
 #include "util.h"
 
-INLINE int8_t kIdx(Square k, Square s) { return (k & 4) == (s & 4); }
+//INLINE int8_t kIdx(Square k, Square s) { return (k & 4) == (s & 4); }
 
 INLINE Piece inv(Piece p) { return opposite[p]; }
 

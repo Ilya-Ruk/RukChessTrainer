@@ -29,7 +29,8 @@ void ParseFen(char* fen, Board* board) {
 
   // Make sure the board is empty
   board->occupancies = 0;
-  for (int i = 0; i < 16; i++) board->pieces[i] = 0;
+  for (int i = 0; i < 16; i++)
+    board->pieces[i] = 0;
 
   board->kings[WHITE] = INT8_MAX;
   board->kings[BLACK] = INT8_MAX;
@@ -37,7 +38,46 @@ void ParseFen(char* fen, Board* board) {
   for (Square sq = 0; sq < 64; sq++) {
     char c = *fen;
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-      Piece pc = charToPiece[(int)*fen];
+      Piece pc;
+
+      switch (c) {
+        case 'P':
+		  pc = WHITE_PAWN;
+		  break;
+        case 'N':
+		  pc = WHITE_KNIGHT;
+		  break;
+        case 'B':
+		  pc = WHITE_BISHOP;
+		  break;
+        case 'R':
+		  pc = WHITE_ROOK;
+		  break;
+        case 'Q':
+		  pc = WHITE_QUEEN;
+		  break;
+        case 'K':
+		  pc = WHITE_KING;
+		  break;
+        case 'p':
+		  pc = BLACK_PAWN;
+		  break;
+        case 'n':
+		  pc = BLACK_KNIGHT;
+		  break;
+        case 'b':
+		  pc = BLACK_BISHOP;
+		  break;
+        case 'r':
+		  pc = BLACK_ROOK;
+		  break;
+        case 'q':
+		  pc = BLACK_QUEEN;
+		  break;
+        case 'k':
+		  pc = BLACK_KING;
+		  break;
+      }
 
       if (c == 'K')
         board->kings[WHITE] = sq;

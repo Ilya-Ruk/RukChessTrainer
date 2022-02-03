@@ -96,8 +96,7 @@ typedef struct {
 
 extern const float SS;
 
-extern const Piece charToPiece[];
 extern const Piece opposite[12];
-extern const Square psqt[64];
+//extern const Square psqt[64];
 
 #endif
