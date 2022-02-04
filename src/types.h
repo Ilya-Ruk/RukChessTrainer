@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define N_INPUT 768
-#define N_HIDDEN 512
+#define N_HIDDEN 256
 #define N_OUTPUT 1
 
 #define THREADS 12

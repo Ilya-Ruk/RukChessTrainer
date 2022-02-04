@@ -77,6 +77,9 @@ void ParseFen(char* fen, Board* board) {
         case 'k':
 		  pc = BLACK_KING;
 		  break;
+		default:
+		  printf("Unable to parse FEN: %s!\n", _fen);
+		  exit(1);
       }
 
       if (c == 'K')
