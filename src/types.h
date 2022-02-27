@@ -5,13 +5,13 @@
 #include <stdbool.h>
 
 #define N_INPUT 768
-#define N_HIDDEN 256
+#define N_HIDDEN 512
 #define N_OUTPUT 1
 
 #define THREADS 12
 #define BATCH_SIZE 16384
 
-#define ALPHA 0.005f
+#define ALPHA 0.01f
 #define BETA1 0.9f
 #define BETA2 0.999f
 #define EPSILON 1e-8f
@@ -20,6 +20,11 @@
 
 #define MAX_VALID_POSITIONS 60000000
 #define MAX_TRAIN_POSITIONS 500000000
+
+//#define CRELU_MAX 256
+
+//#define QUANTIZATION_PRECISION_IN 32
+//#define QUANTIZATION_PRECISION_OUT 512
 
 enum {
   WHITE_PAWN,
@@ -46,7 +51,7 @@ typedef uint16_t Feature;
 typedef struct {
   Color stm;
   uint8_t wdl;
-  Square kings[2];
+//  Square kings[2];
   uint64_t occupancies;
   uint8_t pieces[16];
 } Board; // 28 (32) bytes

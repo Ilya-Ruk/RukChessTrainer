@@ -3,9 +3,8 @@ SRC = *.c
 EXE = trainer
 
 LIBS = -lm
-DEFS = -DNDEBUG
 WFLAGS = -std=gnu17 -Wall -Wextra -Wshadow
-CFLAGS = -O3 $(WFLAGS) -flto -ffast-math -fopenmp -march=native -mtune=native -g
+CFLAGS = -O3 $(WFLAGS) -flto -fopenmp -march=skylake
 
 all:
-	$(CC) $(CFLAGS) $(SRC) $(DEFS) $(LIBS) -o $(EXE)
+	$(CC) $(CFLAGS) $(SRC) $(LIBS) -o $(EXE)

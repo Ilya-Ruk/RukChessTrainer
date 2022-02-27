@@ -16,8 +16,8 @@ void ToFeatures(Board* board, Features* f) {
     Square sq = popLsb(&bb);
     Piece pc = getPiece(board->pieces, f->n);
 
-    f->features[WHITE][f->n] = idx(pc, sq, board->kings[WHITE], WHITE);
-    f->features[BLACK][f->n] = idx(pc, sq, board->kings[BLACK], BLACK);
+    f->features[WHITE][f->n] = idx(pc, sq/*, board->kings[WHITE]*/, WHITE);
+    f->features[BLACK][f->n] = idx(pc, sq/*, board->kings[BLACK]*/, BLACK);
 
     f->n++;
   }
@@ -29,11 +29,10 @@ void ParseFen(char* fen, Board* board) {
 
   // Make sure the board is empty
   board->occupancies = 0;
-  for (int i = 0; i < 16; i++)
-    board->pieces[i] = 0;
+  for (int i = 0; i < 16; i++) board->pieces[i] = 0;
 
-  board->kings[WHITE] = INT8_MAX;
-  board->kings[BLACK] = INT8_MAX;
+//  board->kings[WHITE] = INT8_MAX;
+//  board->kings[BLACK] = INT8_MAX;
 
   for (Square sq = 0; sq < 64; sq++) {
     char c = *fen;
@@ -82,10 +81,10 @@ void ParseFen(char* fen, Board* board) {
 		  exit(1);
       }
 
-      if (c == 'K')
-        board->kings[WHITE] = sq;
-      else if (c == 'k')
-        board->kings[BLACK] = sq;
+//      if (c == 'K')
+//        board->kings[WHITE] = sq;
+//      else if (c == 'k')
+//        board->kings[BLACK] = sq;
 
       setBit(board->occupancies, sq);
       board->pieces[n / 2] |= pc << ((n & 1) << 2);
@@ -103,8 +102,8 @@ void ParseFen(char* fen, Board* board) {
     fen++;
   }
 
-  if (board->kings[WHITE] == INT8_MAX || board->kings[BLACK] == INT8_MAX) {
-    printf("Unable to locate kings in FEN: %s!\n", _fen);
-    exit(1);
-  }
+//  if (board->kings[WHITE] == INT8_MAX || board->kings[BLACK] == INT8_MAX) {
+//    printf("Unable to locate kings in FEN: %s!\n", _fen);
+//    exit(1);
+//  }
 }

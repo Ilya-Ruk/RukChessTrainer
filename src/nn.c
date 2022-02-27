@@ -15,14 +15,12 @@
 const int NETWORK_MAGIC = 'B' | 'R' << 8 | 'K' << 16 | 'R' << 24;
 
 void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results) {
-  results->output = 0.0f;
-
   // Apply first layer
   memcpy(results->acc1[WHITE], nn->inputBiases, sizeof(float) * N_HIDDEN);
   memcpy(results->acc1[BLACK], nn->inputBiases, sizeof(float) * N_HIDDEN);
 
   for (int i = 0; i < f->n; i++) {
-    for (size_t j = 0; j < N_HIDDEN; j++) {
+    for (int j = 0; j < N_HIDDEN; j++) {
       results->acc1[WHITE][j] += nn->inputWeights[f->features[WHITE][i] * N_HIDDEN + j];
       results->acc1[BLACK][j] += nn->inputWeights[f->features[BLACK][i] * N_HIDDEN + j];
     }
@@ -31,9 +29,9 @@ void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results) {
   ReLU(results->acc1[WHITE], N_HIDDEN);
   ReLU(results->acc1[BLACK], N_HIDDEN);
 
-  results->output += DotProduct(results->acc1[stm], nn->outputWeights, N_HIDDEN) +
-                     DotProduct(results->acc1[stm ^ 1], nn->outputWeights + N_HIDDEN, N_HIDDEN) +
-                     nn->outputBias;
+  results->output = DotProduct(results->acc1[stm], nn->outputWeights, N_HIDDEN) +
+                    DotProduct(results->acc1[stm ^ 1], nn->outputWeights + N_HIDDEN, N_HIDDEN) +
+                    nn->outputBias;
 }
 
 NN* LoadNN(char* path) {
@@ -71,13 +69,13 @@ NN* LoadRandomNN() {
   srand(time(NULL));
   NN* nn = AlignedMalloc(sizeof(NN));
 
-  for (int i = 0; i < N_INPUT * N_HIDDEN; i++) nn->inputWeights[i] = RandomGaussian(0, sqrt(1.0 / 32));
+  for (int i = 0; i < N_INPUT * N_HIDDEN; i++) nn->inputWeights[i] = RandomGaussian(0.0f, sqrt(1.0 / 32));
 
-  for (int i = 0; i < N_HIDDEN; i++) nn->inputBiases[i] = 0;
+  for (int i = 0; i < N_HIDDEN; i++) nn->inputBiases[i] = 0.0f;
 
-  for (int i = 0; i < N_HIDDEN * 2; i++) nn->outputWeights[i] = RandomGaussian(0, sqrt(1.0 / N_HIDDEN));
+  for (int i = 0; i < N_HIDDEN * 2; i++) nn->outputWeights[i] = RandomGaussian(0.0f, sqrt(1.0 / N_HIDDEN));
 
-  nn->outputBias = 0;
+  nn->outputBias = 0.0f;
 
   return nn;
 }
