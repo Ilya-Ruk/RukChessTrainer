@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
     int batches = data->n / BATCH_SIZE;
     for (int b = 0; b < batches; b++) {
       Train(b, data, nn, gradients, local);
-      ApplyGradients(nn, gradients/*, epoch*/);
+      ApplyGradients(nn, gradients, epoch);
 
       if ((b + 1) % 1000 == 0) printf("Batch: [#%d/%d]\n", b + 1, batches);
     }

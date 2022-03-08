@@ -69,11 +69,11 @@ NN* LoadRandomNN() {
   srand(time(NULL));
   NN* nn = AlignedMalloc(sizeof(NN));
 
-  for (int i = 0; i < N_INPUT * N_HIDDEN; i++) nn->inputWeights[i] = RandomGaussian(0.0f, sqrt(1.0 / 32));
+  for (int i = 0; i < N_INPUT * N_HIDDEN; i++) nn->inputWeights[i] = RandomGaussian(0.0f, sqrtf(1.0f / 32));
 
   for (int i = 0; i < N_HIDDEN; i++) nn->inputBiases[i] = 0.0f;
 
-  for (int i = 0; i < N_HIDDEN * 2; i++) nn->outputWeights[i] = RandomGaussian(0.0f, sqrt(1.0 / N_HIDDEN));
+  for (int i = 0; i < N_HIDDEN * 2; i++) nn->outputWeights[i] = RandomGaussian(0.0f, sqrtf(1.0f / N_HIDDEN));
 
   nn->outputBias = 0.0f;
 

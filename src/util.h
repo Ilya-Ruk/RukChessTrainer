@@ -11,9 +11,9 @@
 
 long GetTimeMS();
 
-INLINE float Sigmoid(float s) { return 1.0f / (1.0f + expf(-s * (float)SS)); }
+INLINE float Sigmoid(float s) { return 1.0f / (1.0f + expf(-s * SS)); }
 
-INLINE float SigmoidPrime(float s) { return s * (1.0f - s) * (float)SS; }
+INLINE float SigmoidPrime(float s) { return s * (1.0f - s) * SS; }
 
 INLINE float ReLUPrime(float s) { return s > 0.0f; }
 
