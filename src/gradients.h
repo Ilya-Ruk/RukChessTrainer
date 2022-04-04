@@ -8,7 +8,7 @@
 #include "util.h"
 
 void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch/*, float Min, float Max*/) {
-  if (!grad->g) return;
+//  if (!grad->g) return;
 
   // AdaMax
 /*
