@@ -19,7 +19,7 @@
 
 // Adam
 
-#define ALPHA 0.01f
+#define ALPHA 0.005f
 #define BETA1 0.9f
 #define BETA2 0.999f
 #define EPSILON 1e-8f
