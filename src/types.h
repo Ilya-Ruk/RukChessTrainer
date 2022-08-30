@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#define N_INPUT 768
+#define N_INPUT 1536
 #define N_HIDDEN 512
 #define N_OUTPUT 1
 
@@ -61,7 +61,7 @@ typedef uint16_t Feature;
 typedef struct {
   Color stm;
   uint8_t wdl;
-//  Square kings[2];
+  Square kings[2];
   uint64_t occupancies;
   uint8_t pieces[16];
 } Board; // 28 (32) bytes
@@ -112,6 +112,6 @@ typedef struct {
 extern const float SS;
 
 extern const Piece opposite[12];
-//extern const Square psqt[64];
+extern const Square psqt[64];
 
 #endif
