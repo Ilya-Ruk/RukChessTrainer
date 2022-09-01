@@ -1,7 +1,6 @@
-# Berserk NN Trainer
-<img src="resources/berserk.jpg" alt="Berserk" width="400" />
+# RukChess NNUE trainer
 
-A trainer for usage with the [Berserk Chess Engine](https://github.com/jhonnold/berserk).
+A trainer for usage with the [RukChess](https://github.com/Ilya-Ruk/RukChess).
 
 ## License
 Distributed under the GPLv3 License. See `LICENSE` for more information.
