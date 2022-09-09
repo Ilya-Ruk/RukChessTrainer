@@ -1,5 +1,5 @@
-# RukChess NNUE trainer (based on [Berserk NN Trainer](https://github.com/jhonnold/berserk-trainer))
-A trainer for usage with the [RukChess](https://github.com/Ilya-Ruk/RukChess)
+# RukChessTrainer
+Neural networks (NNUE) trainer for usage with the [RukChess](https://github.com/Ilya-Ruk/RukChess) (based on [Berserk NN Trainer](https://github.com/jhonnold/berserk-trainer)).
 
 # Build
     git clone https://github.com/Ilya-Ruk/RukChessTrainer.git
