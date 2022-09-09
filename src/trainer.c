@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     }
 
     char buffer[64];
-    sprintf(buffer, "../nets/berserk-ks.e%d.2x%d.nn", epoch, N_HIDDEN);
+    sprintf(buffer, "../Nets/rukchess_%03d.nnue", epoch);
     SaveNN(nn, buffer);
 
     printf("Calculating Validation Error...\n");
