@@ -5,10 +5,30 @@
 #include <stdlib.h>
 #include <time.h>
 
+uint64_t RandState = 0ULL; // The state can be seeded with any value
+
+/*
+	https://prng.di.unimi.it/splitmix64.c
+*/
+uint64_t Rand64(void)
+{
+	uint64_t Result = (RandState += 0x9E3779B97F4A7C15);
+
+	Result = (Result ^ (Result >> 30)) * 0xBF58476D1CE4E5B9;
+	Result = (Result ^ (Result >> 27)) * 0x94D049BB133111EB;
+
+	return Result ^ (Result >> 31);
+}
+
+void SetRandState(const uint64_t NewRandState)
+{
+	RandState = NewRandState;
+}
+
 // I dunno anything about random number generators, and had a bad one for a while
 // Thanks to Martin Sedlák (author of Cheng) this one is really cool and works :)
 // http://www.vlasak.biz/cheng/
-
+/*
 uint64_t keys[2];
 
 inline uint64_t rotate(uint64_t v, uint8_t s) { return (v >> s) | (v << (64 - s)); }
@@ -24,7 +44,7 @@ void SeedRandom() {
 
   for (int i = 0; i < 64; i++) RandomUInt64();
 }
-
+*/
 // https://phoxis.org/2013/05/04/generating-random-numbers-from-normal-distribution-in-c/
 float RandomGaussian(float mu, float sigma) {
   float U1, U2, W, mult;
