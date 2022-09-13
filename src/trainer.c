@@ -15,9 +15,7 @@
 #include "util.h"
 
 int main(int argc, char** argv) {
-//  SeedRandom();
-
-  SetRandState(GetTimeMS());
+  SeedRandom();
 
   int c;
 

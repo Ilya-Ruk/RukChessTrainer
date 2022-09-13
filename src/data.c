@@ -53,7 +53,7 @@ void ShuffleData(DataSet* data) {
   Board temp;
 
   for (int i = 0; i < data->n; i++) {
-    int j = Rand64() % data->n;
+    int j = RandomUInt64() % data->n;
     temp = data->entries[i];
     data->entries[i] = data->entries[j];
     data->entries[j] = temp;
