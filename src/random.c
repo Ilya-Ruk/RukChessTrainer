@@ -5,24 +5,49 @@
 #include <stdlib.h>
 #include <time.h>
 
-// I dunno anything about random number generators, and had a bad one for a while
-// Thanks to Martin Sedlák (author of Cheng) this one is really cool and works :)
-// http://www.vlasak.biz/cheng/
+// https://prng.di.unimi.it/splitmix64.c
 
-uint64_t keys[2];
+static uint64_t state; /* The state can be seeded with any value. */
 
-inline uint64_t rotate(uint64_t v, uint8_t s) { return (v >> s) | (v << (64 - s)); }
-
-inline uint64_t RandomUInt64() {
-  uint64_t tmp = keys[0];
-  keys[0] += rotate(keys[1] ^ 0xc5462216u ^ ((uint64_t)0xcf14f4ebu << 32), 1);
-  return keys[1] += rotate(tmp ^ 0x75ecfc58u ^ ((uint64_t)0x9576080cu << 32), 9);
+uint64_t next(void) {
+	uint64_t z = (state += 0x9e3779b97f4a7c15);
+	z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
+	z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
+	return z ^ (z >> 31);
 }
 
-void SeedRandom() {
-  keys[0] = keys[1] = time(NULL);
+// https://prng.di.unimi.it/xoshiro256plusplus.c
 
-  for (int i = 0; i < 64; i++) RandomUInt64();
+static uint64_t s[4];
+
+static inline uint64_t rotl(const uint64_t x, int k) {
+	return (x << k) | (x >> (64 - k));
+}
+
+uint64_t RandomUInt64(void) {
+	const uint64_t result = rotl(s[0] + s[3], 23) + s[0];
+
+	const uint64_t t = s[1] << 17;
+
+	s[2] ^= s[0];
+	s[3] ^= s[1];
+	s[1] ^= s[2];
+	s[0] ^= s[3];
+
+	s[2] ^= t;
+
+	s[3] = rotl(s[3], 45);
+
+	return result;
+}
+
+void SeedRandom(void) {
+	state = time(NULL);
+
+	s[0] = next();
+	s[1] = next();
+	s[2] = next();
+	s[3] = next();
 }
 
 // https://phoxis.org/2013/05/04/generating-random-numbers-from-normal-distribution-in-c/
