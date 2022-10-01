@@ -11,12 +11,6 @@
 #define THREADS 12
 #define BATCH_SIZE 16384
 
-// AdaMax
-
-//#define ALPHA 0.002f
-//#define BETA1 0.9f
-//#define BETA2 0.999f
-
 // Adam
 
 #define ALPHA 0.005f

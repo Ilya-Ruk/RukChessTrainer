@@ -10,17 +10,6 @@
 void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch/*, float Min, float Max*/) {
 //  if (!grad->g) return;
 
-  // AdaMax
-/*
-  grad->M = BETA1 * grad->M + (1.0f - BETA1) * grad->g;
-  grad->V = fmaxf(BETA2 * grad->V, fabsf(grad->g));
-
-  if (grad->V > 0.0f) {
-    float delta = ALPHA / (1.0f - powf(BETA1, Epoch)) * (grad->M / grad->V);
-
-    *v -= delta;
-  }
-*/
   // Adam
 
   grad->M = BETA1 * grad->M + (1.0f - BETA1) * grad->g;
