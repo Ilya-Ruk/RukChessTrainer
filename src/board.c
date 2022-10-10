@@ -28,57 +28,74 @@ void ParseFen(char* fen, Board* board) {
   int n = 0;
 
   // Make sure the board is empty
+
   board->occupancies = 0;
-  for (int i = 0; i < 16; i++) board->pieces[i] = 0;
+
+  for (int i = 0; i < 16; i++) {
+    board->pieces[i] = 0;
+  }
 
 //  board->kings[WHITE] = INT8_MAX;
 //  board->kings[BLACK] = INT8_MAX;
 
   for (Square sq = 0; sq < 64; sq++) {
     char c = *fen;
+
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
       Piece pc;
 
       switch (c) {
         case 'P':
-		  pc = WHITE_PAWN;
-		  break;
+          pc = WHITE_PAWN;
+          break;
+
         case 'N':
-		  pc = WHITE_KNIGHT;
-		  break;
+          pc = WHITE_KNIGHT;
+          break;
+
         case 'B':
-		  pc = WHITE_BISHOP;
-		  break;
+          pc = WHITE_BISHOP;
+          break;
+
         case 'R':
-		  pc = WHITE_ROOK;
-		  break;
+          pc = WHITE_ROOK;
+          break;
+
         case 'Q':
-		  pc = WHITE_QUEEN;
-		  break;
+          pc = WHITE_QUEEN;
+          break;
+
         case 'K':
-		  pc = WHITE_KING;
-		  break;
+          pc = WHITE_KING;
+          break;
+
         case 'p':
-		  pc = BLACK_PAWN;
-		  break;
+          pc = BLACK_PAWN;
+          break;
+
         case 'n':
-		  pc = BLACK_KNIGHT;
-		  break;
+          pc = BLACK_KNIGHT;
+          break;
+
         case 'b':
-		  pc = BLACK_BISHOP;
-		  break;
+          pc = BLACK_BISHOP;
+          break;
+
         case 'r':
-		  pc = BLACK_ROOK;
-		  break;
+          pc = BLACK_ROOK;
+          break;
+
         case 'q':
-		  pc = BLACK_QUEEN;
-		  break;
+          pc = BLACK_QUEEN;
+          break;
+
         case 'k':
-		  pc = BLACK_KING;
-		  break;
-		default:
-		  printf("Unable to parse FEN: %s!\n", _fen);
-		  exit(1);
+          pc = BLACK_KING;
+          break;
+
+        default:
+          printf("Unable to parse FEN: %s!\n", _fen);
+          exit(1);
       }
 
 //      if (c == 'K')
@@ -90,11 +107,11 @@ void ParseFen(char* fen, Board* board) {
       board->pieces[n / 2] |= pc << ((n & 1) << 2);
 
       n++;
-    } else if (c >= '1' && c <= '8')
+    } else if (c >= '1' && c <= '8') {
       sq += (c - '1');
-    else if (c == '/')
+    } else if (c == '/') {
       sq--;
-    else {
+    } else {
       printf("Unable to parse FEN: %s!\n", _fen);
       exit(1);
     }

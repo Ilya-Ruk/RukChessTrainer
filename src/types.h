@@ -25,7 +25,7 @@
 #define MAX_VALID_POSITIONS 60000000
 #define MAX_TRAIN_POSITIONS 500000000
 
-//#define CRELU_MAX 256
+//#define CRELU_MAX 255
 
 //#define QUANTIZATION_PRECISION_IN 32
 //#define QUANTIZATION_PRECISION_OUT 512
@@ -45,7 +45,10 @@ enum {
   BLACK_KING,
 };
 
-enum { WHITE, BLACK };
+enum {
+  WHITE,
+  BLACK
+};
 
 typedef uint8_t Color;
 typedef uint8_t Square;
@@ -72,7 +75,7 @@ typedef struct {
 
 typedef struct {
   float outputBias;
-  float outputWeights[2 * N_HIDDEN] __attribute__((aligned(64)));
+  float outputWeights[N_HIDDEN * 2] __attribute__((aligned(64)));
 
   float inputBiases[N_HIDDEN] __attribute__((aligned(64)));
   float inputWeights[N_INPUT * N_HIDDEN] __attribute__((aligned(64)));
@@ -80,7 +83,7 @@ typedef struct {
 
 typedef struct {
   float output;
-  float acc1[2][N_HIDDEN] __attribute__((aligned(64)));
+  float acc[2][N_HIDDEN] __attribute__((aligned(64)));
 } __attribute__((aligned(64))) NNAccumulators;
 
 typedef struct {
@@ -89,7 +92,7 @@ typedef struct {
 
 typedef struct {
   Gradient outputBias;
-  Gradient outputWeights[2 * N_HIDDEN];
+  Gradient outputWeights[N_HIDDEN * 2];
 
   Gradient inputBiases[N_HIDDEN];
   Gradient inputWeights[N_INPUT * N_HIDDEN];
@@ -97,7 +100,7 @@ typedef struct {
 
 typedef struct {
   float outputBias;
-  float outputWeights[2 * N_HIDDEN];
+  float outputWeights[N_HIDDEN * 2];
 
   float inputBiases[N_HIDDEN];
   float inputWeights[N_INPUT * N_HIDDEN];

@@ -19,7 +19,9 @@ INLINE Feature idx(Piece pc, Square sq/*, Square king*/, const Color view) {
   }
 }
 
-INLINE Piece getPiece(uint8_t pieces[16], int n) { return (pieces[n / 2] >> ((n & 1) << 2)) & 0xF; }
+INLINE Piece getPiece(uint8_t pieces[16], int n) {
+  return (pieces[n / 2] >> ((n & 1) << 2)) & 0xF;
+}
 
 void ToFeatures(Board* board, Features* f);
 void ParseFen(char* fen, Board* board);

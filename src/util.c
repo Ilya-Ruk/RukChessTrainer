@@ -8,9 +8,11 @@
 #include "util.h"
 
 #ifdef WIN32
-long GetTimeMS() { return GetTickCount(); }
+long GetTimeMS(void) {
+  return GetTickCount();
+}
 #else
-long GetTimeMS() {
+long GetTimeMS(void) {
   struct timeval time;
   gettimeofday(&time, NULL);
 
@@ -22,7 +24,10 @@ void* AlignedMalloc(int size) {
   void* mem = malloc(size + 64 + sizeof(void*));
   void** ptr = (void**)((uintptr_t)(mem + 64 + sizeof(void*)) & ~(64 - 1));
   ptr[-1] = mem;
+
   return ptr;
 }
 
-void AlignedFree(void* ptr) { free(((void**)ptr)[-1]); }
+void AlignedFree(void* ptr) {
+  free(((void**)ptr)[-1]);
+}
