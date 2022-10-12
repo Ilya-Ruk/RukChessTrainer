@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 
+#include "types.h"
 #include "util.h"
 
 #define bit(sq) (1ULL << (sq))
@@ -11,6 +12,7 @@
 
 INLINE Square popLsb(uint64_t* bb) {
   Square sq = lsb(*bb);
+
   *bb &= *bb - 1;
 
   return sq;

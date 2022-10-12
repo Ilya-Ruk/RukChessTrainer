@@ -6,9 +6,10 @@
 
 #include "board.h"
 #include "random.h"
+#include "types.h"
 #include "util.h"
 
-void LoadDataEntry(char* buffer, Board* result) {
+static void LoadDataEntry(char* buffer, Board* result) {
   ParseFen(buffer, result);
 
   result->stm = strstr(buffer, "w ") ? WHITE : BLACK;

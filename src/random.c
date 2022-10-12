@@ -11,7 +11,7 @@
 
 static uint64_t state; /* The state can be seeded with any value. */
 
-static uint64_t next(void) {
+static uint64_t SplitMix64(void) {
   uint64_t z = (state += 0x9e3779b97f4a7c15);
 
   z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
@@ -48,10 +48,10 @@ uint64_t RandomUInt64(void) {
 void SeedRandom(void) {
   state = time(NULL);
 
-  s[0] = next();
-  s[1] = next();
-  s[2] = next();
-  s[3] = next();
+  s[0] = SplitMix64();
+  s[1] = SplitMix64();
+  s[2] = SplitMix64();
+  s[3] = SplitMix64();
 }
 
 // https://phoxis.org/2013/05/04/generating-random-numbers-from-normal-distribution-in-c/

@@ -1,6 +1,8 @@
 #ifndef TRAINER_H
 #define TRAINER_H
 
+#include <math.h>
+
 #include "types.h"
 #include "util.h"
 

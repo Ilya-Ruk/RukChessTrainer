@@ -1,3 +1,5 @@
+#include "util.h"
+
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -5,7 +7,7 @@
 #include <sys/time.h>
 #endif
 
-#include "util.h"
+#include <stdlib.h>
 
 #ifdef WIN32
 long GetTimeMS(void) {
@@ -14,6 +16,7 @@ long GetTimeMS(void) {
 #else
 long GetTimeMS(void) {
   struct timeval time;
+
   gettimeofday(&time, NULL);
 
   return time.tv_sec * 1000 + time.tv_usec / 1000;
@@ -23,6 +26,7 @@ long GetTimeMS(void) {
 void* AlignedMalloc(int size) {
   void* mem = malloc(size + 64 + sizeof(void*));
   void** ptr = (void**)((uintptr_t)(mem + 64 + sizeof(void*)) & ~(64 - 1));
+
   ptr[-1] = mem;
 
   return ptr;

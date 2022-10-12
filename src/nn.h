@@ -89,7 +89,7 @@ INLINE float DotProduct(float* v1, float* v2, const int n) {
 void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results);
 
 NN* LoadNN(char* path);
-NN* LoadRandomNN();
+NN* LoadRandomNN(void);
 
 void SaveNN(NN* nn, char* path);
 

@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "bits.h"
+#include "types.h"
 
 void ToFeatures(Board* board, Features* f) {
   f->n = 0;
@@ -98,12 +99,14 @@ void ParseFen(char* fen, Board* board) {
           exit(1);
       }
 
-//      if (c == 'K')
+//      if (c == 'K') {
 //        board->kings[WHITE] = sq;
-//      else if (c == 'k')
+//      } else if (c == 'k') {
 //        board->kings[BLACK] = sq;
+//      }
 
       setBit(board->occupancies, sq);
+
       board->pieces[n / 2] |= pc << ((n & 1) << 2);
 
       n++;

@@ -1,5 +1,6 @@
 #include "nn.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -7,6 +8,7 @@
 #include "bits.h"
 #include "board.h"
 #include "random.h"
+#include "types.h"
 #include "util.h"
 
 const int NETWORK_MAGIC = 'B' | 'R' << 8 | 'K' << 16 | 'R' << 24;
@@ -48,6 +50,7 @@ NN* LoadNN(char* path) {
 
   uint64_t hash;
   fread(&hash, sizeof(uint64_t), 1, fp);
+
   printf("Reading network with hash %lx\n", hash);
 
   NN* nn = AlignedMalloc(sizeof(NN));
@@ -62,7 +65,7 @@ NN* LoadNN(char* path) {
   return nn;
 }
 
-NN* LoadRandomNN() {
+NN* LoadRandomNN(void) {
   srand(time(NULL));
 
   NN* nn = AlignedMalloc(sizeof(NN));

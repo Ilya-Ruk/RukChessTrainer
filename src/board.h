@@ -4,8 +4,13 @@
 #include "types.h"
 #include "util.h"
 
-//INLINE int8_t kIdx(Square k, Square s) { return (k & 4) == (s & 4); } // KS
-//INLINE int8_t kIdx(Square k, Square s) { return (((k & 4) == (s & 4)) << 1) + ((k & 32) == (s & 32)); } // KQ
+//INLINE int8_t kIdx(Square k, Square s) {
+//  return (k & 4) == (s & 4); // KS
+//}
+
+//INLINE int8_t kIdx(Square k, Square s) {
+//  return (((k & 4) == (s & 4)) << 1) + ((k & 32) == (s & 32)); // KQ
+//}
 
 INLINE Feature idx(Piece pc, Square sq/*, Square king*/, const Color view) {
   if (view == WHITE) {
