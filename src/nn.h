@@ -27,7 +27,7 @@ INLINE uint64_t NetworkHash(NN* nn) {
 
   return hash;
 }
-
+/*
 INLINE void ReLU(float* v, const int n) {
   const int width = sizeof(__m256) / sizeof(float);
   const int chunks = n / width;
@@ -44,7 +44,7 @@ INLINE void ReLU(float* v, const int n) {
 INLINE float ReLUPrime(float s) {
   return s > 0.0f;
 }
-/*
+*/
 INLINE void CReLU(float* v, const int n) {
   const int width = sizeof(__m256) / sizeof(float);
   const int chunks = n / width;
@@ -62,7 +62,7 @@ INLINE void CReLU(float* v, const int n) {
 INLINE float CReLUPrime(float s) {
   return s > 0.0f && s < CRELU_MAX;
 }
-*/
+
 INLINE float DotProduct(float* v1, float* v2, const int n) {
   const int width = sizeof(__m256) / sizeof(float);
   const int chunks = n / width;
