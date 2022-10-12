@@ -60,8 +60,8 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
     float hiddenLosses[2][N_HIDDEN];
 
     for (int i = 0; i < N_HIDDEN; i++) {
-      hiddenLosses[board.stm][i] = outputLoss * nn->outputWeights[i] * CReLUPrime(activations->acc[board.stm][i]);
-      hiddenLosses[board.stm ^ 1][i] = outputLoss * nn->outputWeights[i + N_HIDDEN] * CReLUPrime(activations->acc[board.stm ^ 1][i]);
+      hiddenLosses[board.stm][i] = outputLoss * nn->outputWeights[i] * ReLUPrime(activations->acc[board.stm][i]);
+      hiddenLosses[board.stm ^ 1][i] = outputLoss * nn->outputWeights[i + N_HIDDEN] * ReLUPrime(activations->acc[board.stm ^ 1][i]);
     }
 
     // OUTPUT LAYER GRADIENTS
