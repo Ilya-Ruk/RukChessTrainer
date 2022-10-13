@@ -1,13 +1,13 @@
 #ifndef GRADIENTS_H
 #define GRADIENTS_H
 
-#include <limits.h>
+//#include <limits.h>
 #include <string.h>
 
 #include "types.h"
 #include "util.h"
 
-void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch, float Min, float Max) {
+void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch/*, float Min, float Max*/) {
 //  if (!grad->g) return;
 
   // Adam
@@ -23,7 +23,7 @@ void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch, float Min, floa
   float delta = ALPHA * M_Corrected / (sqrtf(V_Corrected) + EPSILON);
 
   *v -= delta;
-
+/*
   if (*v < Min) {
     *v = Min;
   }
@@ -31,27 +31,27 @@ void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch, float Min, floa
   if (*v > Max) {
     *v = Max;
   }
-
+*/
   grad->g = 0.0f;
 }
 
 void ApplyGradients(NN* nn, NNGradients* g, int Epoch) {
 #pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int i = 0; i < N_INPUT * N_HIDDEN; i++) {
-    UpdateAndApplyGradient(&nn->inputWeights[i], &g->inputWeights[i], Epoch, (float)SHRT_MIN / QUANTIZATION_PRECISION_IN, (float)SHRT_MAX / QUANTIZATION_PRECISION_IN);
+    UpdateAndApplyGradient(&nn->inputWeights[i], &g->inputWeights[i], Epoch/*, (float)SHRT_MIN / QUANTIZATION_PRECISION_IN, (float)SHRT_MAX / QUANTIZATION_PRECISION_IN*/);
   }
 
 #pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int i = 0; i < N_HIDDEN; i++) {
-    UpdateAndApplyGradient(&nn->inputBiases[i], &g->inputBiases[i], Epoch, (float)SHRT_MIN / QUANTIZATION_PRECISION_IN, (float)SHRT_MAX / QUANTIZATION_PRECISION_IN);
+    UpdateAndApplyGradient(&nn->inputBiases[i], &g->inputBiases[i], Epoch/*, (float)SHRT_MIN / QUANTIZATION_PRECISION_IN, (float)SHRT_MAX / QUANTIZATION_PRECISION_IN*/);
   }
 
 #pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int i = 0; i < N_HIDDEN * 2; i++) {
-    UpdateAndApplyGradient(&nn->outputWeights[i], &g->outputWeights[i], Epoch, (float)SHRT_MIN / QUANTIZATION_PRECISION_OUT, (float)SHRT_MAX / QUANTIZATION_PRECISION_OUT);
+    UpdateAndApplyGradient(&nn->outputWeights[i], &g->outputWeights[i], Epoch/*, (float)SHRT_MIN / QUANTIZATION_PRECISION_OUT, (float)SHRT_MAX / QUANTIZATION_PRECISION_OUT*/);
   }
 
-  UpdateAndApplyGradient(&nn->outputBias, &g->outputBias, Epoch, (float)SHRT_MIN / QUANTIZATION_PRECISION_OUT, (float)SHRT_MAX / QUANTIZATION_PRECISION_OUT);
+  UpdateAndApplyGradient(&nn->outputBias, &g->outputBias, Epoch/*, (float)SHRT_MIN / QUANTIZATION_PRECISION_OUT, (float)SHRT_MAX / QUANTIZATION_PRECISION_OUT*/);
 }
 
 void ClearGradients(NNGradients* gradients) {
