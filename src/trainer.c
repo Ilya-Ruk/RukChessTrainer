@@ -76,16 +76,16 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
     // INPUT LAYER GRADIENTS
 
     for (int i = 0; i < N_HIDDEN; i++) {
-//      float stmLasso = LAMBDA * (activations->acc[board.stm][i] > 0);
-//      float xstmLasso = LAMBDA * (activations->acc[board.stm ^ 1][i] > 0);
+//      float stmLasso = LAMBDA * (activations->acc[board.stm][i] > 0.0f);
+//      float xstmLasso = LAMBDA * (activations->acc[board.stm ^ 1][i] > 0.0f);
 
       local[t].inputBiases[i] += hiddenLosses[board.stm][i] + hiddenLosses[board.stm ^ 1][i]/* + stmLasso + xstmLasso*/;
     }
 
     for (int i = 0; i < f->n; i++) {
       for (int j = 0; j < N_HIDDEN; j++) {
-//        float stmLasso = LAMBDA * (activations->acc[board.stm][j] > 0);
-//        float xstmLasso = LAMBDA * (activations->acc[board.stm ^ 1][j] > 0);
+//        float stmLasso = LAMBDA * (activations->acc[board.stm][j] > 0.0f);
+//        float xstmLasso = LAMBDA * (activations->acc[board.stm ^ 1][j] > 0.0f);
 
         local[t].inputWeights[f->features[board.stm][i] * N_HIDDEN + j] += hiddenLosses[board.stm][j]/* + stmLasso*/;
         local[t].inputWeights[f->features[board.stm ^ 1][i] * N_HIDDEN + j] += hiddenLosses[board.stm ^ 1][j]/* + xstmLasso*/;
