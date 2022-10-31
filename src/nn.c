@@ -14,8 +14,12 @@
 const int NETWORK_MAGIC = 'B' | 'R' << 8 | 'K' << 16 | 'R' << 24;
 
 void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results) {
+  // Input biases
+
   memcpy(results->acc[WHITE], nn->inputBiases, sizeof(float) * N_HIDDEN);
   memcpy(results->acc[BLACK], nn->inputBiases, sizeof(float) * N_HIDDEN);
+
+  // Input weights
 
   for (int i = 0; i < f->n; i++) {
     for (int j = 0; j < N_HIDDEN; j++) {
@@ -24,11 +28,15 @@ void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results) {
     }
   }
 
-  ReLU(results->acc[WHITE], N_HIDDEN);
-  ReLU(results->acc[BLACK], N_HIDDEN);
+  // ReLU
 
-  results->output = DotProduct(results->acc[stm], nn->outputWeights, N_HIDDEN) +
-                    DotProduct(results->acc[stm ^ 1], nn->outputWeights + N_HIDDEN, N_HIDDEN) +
+  ReLU(results->acc[WHITE]);
+  ReLU(results->acc[BLACK]);
+
+  // Output
+
+  results->output = DotProduct(results->acc[stm], nn->outputWeights) +
+                    DotProduct(results->acc[stm ^ 1], nn->outputWeights + N_HIDDEN) +
                     nn->outputBias;
 }
 
@@ -37,6 +45,7 @@ NN* LoadNN(char* path) {
 
   if (fp == NULL) {
     printf("Unable to read network at %s!\n", path);
+
     exit(1);
   }
 
@@ -45,6 +54,7 @@ NN* LoadNN(char* path) {
 
   if (magic != NETWORK_MAGIC) {
     printf("Magic header does not match!\n");
+
     exit(1);
   }
 
@@ -92,6 +102,7 @@ void SaveNN(NN* nn, char* path) {
 
   if (fp == NULL) {
     printf("Unable to save network to %s!\n", path);
+
     exit(1);
   }
 

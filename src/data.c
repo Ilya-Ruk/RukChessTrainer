@@ -22,6 +22,7 @@ static void LoadDataEntry(char* buffer, Board* result) {
     result->wdl = 0;
   } else {
     printf("Cannot parse entry: %s!\n", buffer);
+
     exit(1);
   }
 
@@ -36,6 +37,7 @@ void LoadEntries(char* path, DataSet* data, int n) {
 
   if (fp == NULL) {
     printf("Cannot open file: %s!\n", path);
+
     exit(1);
   }
 
@@ -45,14 +47,14 @@ void LoadEntries(char* path, DataSet* data, int n) {
   while (p < n && fgets(in, 128, fp)) {
     LoadDataEntry(in, &data->entries[p++]);
 
-    if (p % 1000000 == 0) {
-      printf("\nLoaded positions: [%10d]", p);
+    if ((p % 1000000) == 0) {
+      printf("Loaded positions: %10d\n", p);
     }
   }
 
   data->n = p;
 
-  printf("\nLoaded positions: [%10d]\n", p);
+  printf("Loaded positions: %10d\n", p);
 }
 
 void ShuffleData(DataSet* data) {

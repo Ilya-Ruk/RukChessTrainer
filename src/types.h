@@ -11,6 +11,8 @@
 #define THREADS 12
 #define BATCH_SIZE 16384
 
+#define NUM_REGS (N_HIDDEN * (int)sizeof(float) / (int)sizeof(__m256)) // 64
+
 // Adam
 
 #define ALPHA 0.005f

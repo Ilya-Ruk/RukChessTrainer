@@ -53,7 +53,7 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
 
     float out = Sigmoid(activations->output);
 
-    // LOSS CALCULATIONS
+    // Loss calculations
 
     float outputLoss = SigmoidPrime(out) * ErrorGradient(out, &board);
 
@@ -64,7 +64,7 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
       hiddenLosses[board.stm ^ 1][i] = outputLoss * nn->outputWeights[i + N_HIDDEN] * ReLUPrime(activations->acc[board.stm ^ 1][i]);
     }
 
-    // OUTPUT LAYER GRADIENTS
+    // Output layer gradients
 
     local[t].outputBias += outputLoss;
 
@@ -73,7 +73,7 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
       local[t].outputWeights[i + N_HIDDEN] += activations->acc[board.stm ^ 1][i] * outputLoss;
     }
 
-    // INPUT LAYER GRADIENTS
+    // Input layer gradients
 
     for (int i = 0; i < N_HIDDEN; i++) {
 //      float stmLasso = LAMBDA * (activations->acc[board.stm][i] > 0.0f);
@@ -122,9 +122,12 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
 int main(int argc, char** argv) {
   SeedRandom();
 
+  // Read command options
+
   int c;
 
   char nnPath[128] = {0};
+
   char validPath[128] = {0};
   char trainPath[128] = {0};
 
@@ -149,78 +152,141 @@ int main(int argc, char** argv) {
 
   if (!validPath[0]) {
     printf("No valid data file specified!\n");
+
     return 1;
   }
 
   if (!trainPath[0]) {
     printf("No train data file specified!\n");
+
     return 1;
   }
 
+  // Load or generate net
+
   NN* nn;
+
   if (!nnPath[0]) {
-    printf("No net specified, generating a random net.\n");
+    printf("No net specified, generating a random net...\n");
 
     nn = LoadRandomNN();
+
+    printf("No net specified, generating a random net...DONE\n\n");
   } else {
-    printf("Loading net from %s\n", nnPath);
+    printf("Loading net from %s...\n", nnPath);
 
     nn = LoadNN(nnPath);
+
+    printf("Loading net from %s...DONE\n\n", nnPath);
   }
 
-  printf("Loading valid data from %s\n", validPath);
+  // Load valid data
 
-  DataSet* validation = malloc(sizeof(DataSet));
-  validation->n = 0;
-  validation->entries = malloc(sizeof(Board) * MAX_VALID_POSITIONS);
-  LoadEntries(validPath, validation, MAX_VALID_POSITIONS);
+  printf("Loading valid data from %s...\n", validPath);
 
-  printf("Loading train data from %s\n", trainPath);
+  DataSet* validData = malloc(sizeof(DataSet));
 
-  DataSet* data = malloc(sizeof(DataSet));
-  data->n = 0;
-  data->entries = malloc(sizeof(Board) * MAX_TRAIN_POSITIONS);
-  LoadEntries(trainPath, data, MAX_TRAIN_POSITIONS);
+  validData->n = 0;
+  validData->entries = malloc(sizeof(Board) * MAX_VALID_POSITIONS);
+
+  LoadEntries(validPath, validData, MAX_VALID_POSITIONS);
+
+  printf("Loading valid data from %s...DONE\n\n", validPath);
+
+  // Load train data
+
+  printf("Loading train data from %s...\n", trainPath);
+
+  DataSet* trainData = malloc(sizeof(DataSet));
+
+  trainData->n = 0;
+  trainData->entries = malloc(sizeof(Board) * MAX_TRAIN_POSITIONS);
+
+  LoadEntries(trainPath, trainData, MAX_TRAIN_POSITIONS);
+
+  printf("Loading train data from %s...DONE\n\n", trainPath);
+
+  // Prepare gradients
 
   NNGradients* gradients = malloc(sizeof(NNGradients));
+
   ClearGradients(gradients);
 
   BatchGradients* local = malloc(sizeof(BatchGradients) * THREADS);
 
-  printf("Calculating Validation Error...\n");
-  float error = TotalError(validation, nn);
-  printf("Starting Error: [%1.8f]\n", error);
+  // Calculate valid error
+
+  printf("Calculating valid error...\n");
+
+  float validError = TotalError(validData, nn);
+
+  printf("Calculating valid error...DONE\n\n");
+
+  printf("Valid error: %.8f\n\n", validError);
+
+  // Train net
 
   for (int epoch = 1; epoch <= 250; epoch++) {
-    long epochStart = GetTimeMS();
+    long epochStartTime = GetTimeMS();
 
-    printf("Shuffling...\n");
-    ShuffleData(data);
-    printf("Shuffling...DONE\n");
+    // Shuffle train data
 
-    int batches = data->n / BATCH_SIZE;
+    printf("Shuffling train data...\n");
+
+    ShuffleData(trainData);
+
+    printf("Shuffling train data...DONE\n\n");
+
+    // Train net
+
+    printf("Train net...\n");
+
+    int batches = trainData->n / BATCH_SIZE;
 
     for (int b = 0; b < batches; b++) {
-      Train(b, data, nn, gradients, local);
+      Train(b, trainData, nn, gradients, local);
+
       ApplyGradients(nn, gradients, epoch);
 
-      if ((b + 1) % 1000 == 0) {
-        printf("Batch: [#%d/%d]\n", b + 1, batches);
+      if (((b + 1) % 1000) == 0) {
+        printf("Batch: %d / %d\n", b + 1, batches);
       }
     }
 
+    printf("Train net...DONE\n\n");
+
+    // Save net
+
+    printf("Save net...\n");
+
     char buffer[64];
+
     sprintf(buffer, "../Nets/rukchess_%03d.nnue", epoch);
+
     SaveNN(nn, buffer);
 
-    printf("Calculating Validation Error...\n");
-    float newError = TotalError(validation, nn);
+    printf("Save net...DONE\n\n");
 
-    long now = GetTimeMS();
-    printf("Epoch: [#%5d], Error: [%1.8f], Delta: [%+1.8f], LR: [%.5f], Speed: [%9.0f pos/s], Time: [%lds]\n", epoch,
-           newError, error - newError, ALPHA, 1000.0 * data->n / (now - epochStart), (now - epochStart) / 1000);
+    // Calculate valid error
 
-    error = newError;
+    printf("Calculating valid error...\n");
+
+    float newValidError = TotalError(validData, nn);
+
+    printf("Calculating valid error...DONE\n\n");
+
+    // Print epoch, valid error and delta, time and speed
+
+    long epochEndTime = GetTimeMS();
+
+    printf("Epoch: %3d Valid error: %.8f (%.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
+           epoch, newValidError, newValidError - validError,
+           (epochEndTime - epochStartTime) / 1000,
+           1000.0f * trainData->n / (epochEndTime - epochStartTime));
+
+    // Update valid error
+
+    validError = newValidError;
   }
 
   return 0;

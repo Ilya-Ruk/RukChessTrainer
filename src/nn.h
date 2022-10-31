@@ -28,15 +28,12 @@ INLINE uint64_t NetworkHash(NN* nn) {
   return hash;
 }
 
-INLINE void ReLU(float* v, const int n) {
-  const int width = sizeof(__m256) / sizeof(float);
-  const int chunks = n / width;
-
+INLINE void ReLU(float* v) {
   const __m256 zero = _mm256_setzero_ps();
 
   __m256* vector = (__m256*)v;
 
-  for (int j = 0; j < chunks; j++) {
+  for (int j = 0; j < NUM_REGS; j++) {
     vector[j] = _mm256_max_ps(zero, vector[j]);
   }
 }
@@ -45,16 +42,13 @@ INLINE float ReLUPrime(float s) {
   return s > 0.0f;
 }
 /*
-INLINE void CReLU(float* v, const int n) {
-  const int width = sizeof(__m256) / sizeof(float);
-  const int chunks = n / width;
-
+INLINE void CReLU(float* v) {
   const __m256 zero = _mm256_setzero_ps();
   const __m256 max = _mm256_set1_ps(CRELU_MAX);
 
   __m256* vector = (__m256*)v;
 
-  for (int j = 0; j < chunks; j++) {
+  for (int j = 0; j < NUM_REGS; j++) {
     vector[j] = _mm256_min_ps(max, _mm256_max_ps(zero, vector[j]));
   }
 }
@@ -63,17 +57,14 @@ INLINE float CReLUPrime(float s) {
   return s > 0.0f && s < CRELU_MAX;
 }
 */
-INLINE float DotProduct(float* v1, float* v2, const int n) {
-  const int width = sizeof(__m256) / sizeof(float);
-  const int chunks = n / width;
-
+INLINE float DotProduct(float* v1, float* v2) {
   __m256 s0 = _mm256_setzero_ps();
   __m256 s1 = _mm256_setzero_ps();
 
   __m256* vector1 = (__m256*)v1;
   __m256* vector2 = (__m256*)v2;
 
-  for (int j = 0; j < chunks; j += 2) {
+  for (int j = 0; j < NUM_REGS; j += 2) {
     s0 = _mm256_add_ps(_mm256_mul_ps(vector1[j], vector2[j]), s0);
     s1 = _mm256_add_ps(_mm256_mul_ps(vector1[j + 1], vector2[j + 1]), s1);
   }
