@@ -279,7 +279,7 @@ int main(int argc, char** argv) {
 
     long epochEndTime = GetTimeMS();
 
-    printf("Epoch: %3d Valid error: %.8f (%.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
+    printf("Epoch: %3d Valid error: %.8f (%+.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
            epoch, newValidError, newValidError - validError,
            (epochEndTime - epochStartTime) / 1000,
            1000.0f * trainData->n / (epochEndTime - epochStartTime));
