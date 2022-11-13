@@ -8,21 +8,21 @@
 #include "util.h"
 
 void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch/*, float Min, float Max*/) {
-//  if (grad->g == 0.0f) {
-//    return;
-//  }
+  if (grad->g == 0.0f) {
+    return;
+  }
 
   // Adam
 
   grad->M = BETA1 * grad->M + (1.0f - BETA1) * grad->g;
   grad->V = BETA2 * grad->V + (1.0f - BETA2) * grad->g * grad->g;
 
-//  float delta = ALPHA * grad->M / (sqrtf(grad->V) + EPSILON);
+  float delta = ALPHA * grad->M / (sqrtf(grad->V) + EPSILON);
 
-  float M_Corrected = grad->M / (1.0f - powf(BETA1, Epoch));
-  float V_Corrected = grad->V / (1.0f - powf(BETA2, Epoch));
+//  float M_Corrected = grad->M / (1.0f - powf(BETA1, Epoch));
+//  float V_Corrected = grad->V / (1.0f - powf(BETA2, Epoch));
 
-  float delta = ALPHA * M_Corrected / (sqrtf(V_Corrected) + EPSILON);
+//  float delta = ALPHA * M_Corrected / (sqrtf(V_Corrected) + EPSILON);
 
   *v -= delta;
 /*
