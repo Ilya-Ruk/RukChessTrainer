@@ -63,7 +63,7 @@ float RandomGaussian(float mu, float sigma) {
   static int call = 0;
 
   if (call == 1) {
-    call = 0;
+    call = !call;
 
     return (mu + sigma * X2);
   }
@@ -80,7 +80,7 @@ float RandomGaussian(float mu, float sigma) {
   X1 = U1 * mult;
   X2 = U2 * mult;
 
-  call = 1;
+  call = !call;
 
   return (mu + sigma * X1);
 }
