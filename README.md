@@ -13,7 +13,7 @@ Neural networks (NNUE) trainer for usage with the [RukChess](https://github.com/
 3. Unzip the archive to c:\Train folder (2846288 games, 3.00 GB)
 4. Rename the unpacked file to games.pgn
 5. Convert games.pgn to games.fen (use RukChess 3.0, Convert PGN file (games.pgn) to FEN file (games.fen)) (~43 min., 393513458 positions, 21.73 GB)
-6. Split games.fen into validation (10%) and training (90%) data sets (use split_file from [RukChessUtils](https://github.com/Ilya-Ruk/RukChessUtils))
+6. Split games.fen into validation (10%) and training (90%) data sets (~3 min.) (use split_file from [RukChessUtils](https://github.com/Ilya-Ruk/RukChessUtils))
 
         split_file.exe games.fen games_valid.fen games_train.fen
 
