@@ -62,8 +62,8 @@ typedef struct {
   uint8_t wdl;
 //  Square kings[2];
   uint64_t occupancies;
-  uint8_t pieces[16];
-} Board; // 28 (32) bytes
+  Piece pieces[16];
+} Board; // 28/26 (32) bytes
 
 typedef struct {
   int8_t n;

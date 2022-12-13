@@ -72,7 +72,7 @@ float RandomGaussian(float mu, float sigma) {
     U1 = -1.0f + ((float)rand() / RAND_MAX) * 2.0f;
     U2 = -1.0f + ((float)rand() / RAND_MAX) * 2.0f;
 
-    W = powf(U1, 2) + powf(U2, 2);
+    W = powf(U1, 2.0f) + powf(U2, 2.0f);
   } while (W == 0.0f || W >= 1.0f);
 
   mult = sqrtf((-2.0f * logf(W)) / W);

@@ -116,6 +116,7 @@ void ParseFen(char* fen, Board* board) {
       sq--;
     } else {
       printf("Unable to parse FEN: %s!\n", _fen);
+
       exit(1);
     }
 
@@ -124,6 +125,7 @@ void ParseFen(char* fen, Board* board) {
 
 //  if (board->kings[WHITE] == INT8_MAX || board->kings[BLACK] == INT8_MAX) {
 //    printf("Unable to locate kings in FEN: %s!\n", _fen);
+
 //    exit(1);
 //  }
 }

@@ -55,7 +55,7 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
 
     // Loss calculations
 
-    float outputLoss = SigmoidPrime(out) * ErrorGradient(out, &board);
+    float outputLoss = SigmoidPrime(out) * ErrorPrime(out, &board);
 
     float hiddenLosses[2][N_HIDDEN];
 

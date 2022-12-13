@@ -24,7 +24,7 @@ INLINE Feature idx(Piece pc, Square sq/*, Square king*/, const Color view) {
   }
 }
 
-INLINE Piece getPiece(uint8_t pieces[16], int n) {
+INLINE Piece getPiece(Piece pieces[16], int n) {
   return (pieces[n / 2] >> ((n & 1) << 2)) & 0xF;
 }
 
