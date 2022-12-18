@@ -7,8 +7,6 @@
 #include "types.h"
 #include "util.h"
 
-//#define MAX(First, Second) ((First) >= (Second) ? (First) : (Second))
-
 void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch/*, float Min, float Max*/) {
   if (grad->g == 0.0f) {
     return;
@@ -20,8 +18,6 @@ void UpdateAndApplyGradient(float* v, Gradient* grad, int Epoch/*, float Min, fl
   grad->V = BETA2 * grad->V + (1.0f - BETA2) * grad->g * grad->g;
 
   float delta = ALPHA * grad->M / (sqrtf(grad->V) + EPSILON);
-
-//  float delta = ALPHA * grad->M / MAX(sqrtf(grad->V), EPSILON);
 
 //  float M_Corrected = grad->M / (1.0f - powf(BETA1, Epoch));
 //  float V_Corrected = grad->V / (1.0f - powf(BETA2, Epoch));
