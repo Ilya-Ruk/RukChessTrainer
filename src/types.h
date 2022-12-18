@@ -60,10 +60,9 @@ typedef uint16_t Feature;
 typedef struct {
   Color stm;
   uint8_t wdl;
-//  Square kings[2];
   uint64_t occupancies;
   Piece pieces[16];
-} Board; // 28/26 (32) bytes
+} Board; // 26 (32) bytes
 
 typedef struct {
   int8_t n;
@@ -111,6 +110,5 @@ typedef struct {
 extern const float SS;
 
 extern const Piece opposite[12];
-//extern const Square psqt[64];
 
 #endif
