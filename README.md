@@ -18,7 +18,7 @@ Neural networks (NNUE) trainer (based on [Berserk NN Trainer](https://github.com
         split_file.exe games.fen games_valid.fen games_train.fen
 
 7. Create folder c:\Nets
-8. Train the neural network (~12 GB RAM, ~535 sec./epoch, ~100 epochs, ~15 hours)
+8. Train the neural network (~12 GB RAM, ~460 sec./epoch, ~180 epochs, ~23 hours)
 
         trainer.exe -v games_valid.fen -t games_train.fen
 
