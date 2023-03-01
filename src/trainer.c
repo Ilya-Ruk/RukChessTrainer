@@ -202,12 +202,12 @@ int main(int argc, char** argv) {
   // Accumulator max.
   // Output min. and max.
 
-  float maxAcc = -FLT_MAX;
-
-  float minOut = FLT_MAX;
-  float maxOut = -FLT_MAX;
-
   if (m) {
+    float maxAcc = -FLT_MAX;
+
+    float minOut = FLT_MAX;
+    float maxOut = -FLT_MAX;
+
     for (int i = 0; i < validData->n; i++) {
       Board board = validData->entries[i];
 
