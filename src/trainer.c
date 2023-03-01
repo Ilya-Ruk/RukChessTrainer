@@ -1,5 +1,6 @@
 #include "trainer.h"
 
+#include <float.h>
 #include <math.h>
 #include <omp.h>
 #include <stdio.h>
@@ -125,13 +126,14 @@ int main(int argc, char** argv) {
   // Read command options
 
   int c;
+  int m = 0;
 
   char nnPath[128] = {0};
 
   char validPath[128] = {0};
   char trainPath[128] = {0};
 
-  while ((c = getopt(argc, argv, "n:v:t:")) != -1) {
+  while ((c = getopt(argc, argv, "n:v:t:m")) != -1) {
     switch (c) {
       case 'n':
         strcpy(nnPath, optarg);
@@ -143,6 +145,10 @@ int main(int argc, char** argv) {
 
       case 't':
         strcpy(trainPath, optarg);
+        break;
+
+      case 'm':
+        m = 1;
         break;
 
       default:
@@ -192,6 +198,57 @@ int main(int argc, char** argv) {
   LoadEntries(validPath, validData, MAX_VALID_POSITIONS);
 
   printf("Loading valid data from %s...DONE\n\n", validPath);
+
+  // Accumulator max.
+  // Output min. and max.
+
+  float maxAcc = -FLT_MAX;
+
+  float minOut = FLT_MAX;
+  float maxOut = -FLT_MAX;
+
+  if (m) {
+    for (int i = 0; i < validData->n; i++) {
+      Board board = validData->entries[i];
+
+      NNAccumulators activations[1];
+      Features f[1];
+
+      ToFeatures(&board, f);
+      NNPredict(nn, f, board.stm, activations);
+
+      for (int j = 0; j < N_HIDDEN; j++) {
+        float acc = activations->acc[WHITE][j];
+
+        if (acc > maxAcc) {
+          maxAcc = acc;
+        }
+      }
+
+      for (int j = 0; j < N_HIDDEN; j++) {
+        float acc = activations->acc[BLACK][j];
+
+        if (acc > maxAcc) {
+          maxAcc = acc;
+        }
+      }
+
+      float out = activations->output;
+
+      if (out < minOut) {
+        minOut = out;
+      }
+
+      if (out > maxOut) {
+        maxOut = out;
+      }
+    }
+
+    printf("maxAcc = %.8f\n", maxAcc);
+    printf("minOut = %.8f maxOut = %.8f\n", minOut, maxOut);
+
+    return 0;
+  }
 
   // Load train data
 
