@@ -41,22 +41,7 @@ INLINE void ReLU(float* v) {
 INLINE float ReLUPrime(float s) {
   return s > 0.0f;
 }
-/*
-INLINE void CReLU(float* v) {
-  const __m256 zero = _mm256_setzero_ps();
-  const __m256 max = _mm256_set1_ps(CRELU_MAX);
 
-  __m256* vector = (__m256*)v;
-
-  for (int j = 0; j < NUM_REGS; j++) {
-    vector[j] = _mm256_min_ps(max, _mm256_max_ps(zero, vector[j]));
-  }
-}
-
-INLINE float CReLUPrime(float s) {
-  return s > 0.0f && s < CRELU_MAX;
-}
-*/
 INLINE float DotProduct(float* v1, float* v2) {
   __m256 s0 = _mm256_setzero_ps();
   __m256 s1 = _mm256_setzero_ps();
