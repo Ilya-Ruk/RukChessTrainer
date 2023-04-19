@@ -303,7 +303,7 @@ int main(int argc, char** argv) {
     for (int b = 0; b < batches; b++) {
       Train(b, trainData, nn, gradients, local);
 
-      ApplyGradients(nn, gradients, epoch);
+      ApplyGradients(nn, gradients/*, epoch*/);
 
       if (((b + 1) % 1000) == 0) {
         printf("Batch: %5d / %5d\n", b + 1, batches);
