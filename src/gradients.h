@@ -1,7 +1,6 @@
 #ifndef GRADIENTS_H
 #define GRADIENTS_H
 
-//#include <limits.h>
 #include <string.h>
 
 #include "types.h"
