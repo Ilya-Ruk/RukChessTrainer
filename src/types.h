@@ -20,10 +20,6 @@
 #define BETA2 0.999f
 #define EPSILON 1e-8f
 
-// L1 regularization (Lasso regression)
-
-//#define LAMBDA (1.0f / (1024 * 1024))
-
 #define MAX_VALID_POSITIONS 60000000
 #define MAX_TRAIN_POSITIONS 500000000
 
