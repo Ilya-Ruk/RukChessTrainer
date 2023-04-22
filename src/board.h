@@ -4,7 +4,7 @@
 #include "types.h"
 #include "util.h"
 
-INLINE Feature idx(Piece pc, Square sq, const Color view) {
+INLINE Feature idx(const Piece pc, const Square sq, const Color view) {
   if (view == WHITE) {
     return (pc << 6) + sq;
   } else {

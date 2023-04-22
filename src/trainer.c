@@ -22,13 +22,13 @@ static float TotalError(DataSet* data, NN* nn) {
   for (int i = 0; i < data->n; i++) {
     Board* board = &data->entries[i];
 
-    NNAccumulators results[1];
     Features f[1];
+    NNAccumulators activations[1];
 
     ToFeatures(board, f);
-    NNPredict(nn, f, board->stm, results);
+    NNPredict(nn, f, board->stm, activations);
 
-    e += Error(Sigmoid(results->output), board);
+    e += Error(Sigmoid(activations->output), board);
   }
 
   return e / data->n;
@@ -46,8 +46,8 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
 
     Board board = data->entries[n + batch * BATCH_SIZE];
 
-    NNAccumulators activations[1];
     Features f[1];
+    NNAccumulators activations[1];
 
     ToFeatures(&board, f);
     NNPredict(nn, f, board.stm, activations);
@@ -205,25 +205,19 @@ int main(int argc, char** argv) {
     for (int i = 0; i < validData->n; i++) {
       Board board = validData->entries[i];
 
-      NNAccumulators activations[1];
       Features f[1];
+      NNAccumulators activations[1];
 
       ToFeatures(&board, f);
       NNPredict(nn, f, board.stm, activations);
 
-      for (int j = 0; j < N_HIDDEN; j++) {
-        float acc = activations->acc[WHITE][j];
+      for (int j = 0; j < 2; j++) { // WHITE, BLACK
+        for (int k = 0; k < N_HIDDEN; k++) {
+          float acc = activations->acc[j][k];
 
-        if (acc > maxAcc) {
-          maxAcc = acc;
-        }
-      }
-
-      for (int j = 0; j < N_HIDDEN; j++) {
-        float acc = activations->acc[BLACK][j];
-
-        if (acc > maxAcc) {
-          maxAcc = acc;
+          if (acc > maxAcc) {
+            maxAcc = acc;
+          }
         }
       }
 
