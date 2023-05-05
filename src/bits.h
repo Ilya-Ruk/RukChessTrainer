@@ -10,7 +10,8 @@
 #define setBit(bb, sq) ((bb) |= bit(sq))
 #define lsb(bb) (__builtin_ctzll(bb))
 
-INLINE Square popLsb(uint64_t* bb) {
+INLINE Square popLsb(uint64_t* bb)
+{
   Square sq = lsb(*bb);
 
   *bb &= *bb - 1;

@@ -15,7 +15,8 @@
 #include "random.h"
 #include "util.h"
 
-static float TotalError(DataSet* data, NN* nn) {
+static float TotalError(DataSet* data, NN* nn)
+{
   float e = 0.0f;
 
 #pragma omp parallel for schedule(auto) num_threads(THREADS) reduction(+ : e)
@@ -34,7 +35,8 @@ static float TotalError(DataSet* data, NN* nn) {
   return e / data->n;
 }
 
-static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradients* local) {
+static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradients* local)
+{
 #pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int t = 0; t < THREADS; t++) {
     memset(&local[t], 0, sizeof(BatchGradients));
@@ -114,7 +116,8 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
   }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   SeedRandom();
 
   // Read command options

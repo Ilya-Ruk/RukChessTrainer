@@ -4,7 +4,8 @@
 #include "types.h"
 #include "util.h"
 
-INLINE Feature idx(const Piece pc, const Square sq, const Color view) {
+INLINE Feature idx(const Piece pc, const Square sq, const Color view)
+{
   if (view == WHITE) {
     return (pc << 6) + sq;
   } else {
@@ -12,7 +13,8 @@ INLINE Feature idx(const Piece pc, const Square sq, const Color view) {
   }
 }
 
-INLINE Piece getPiece(Piece pieces[16], int n) {
+INLINE Piece getPiece(Piece pieces[16], int n)
+{
   return (pieces[n / 2] >> ((n & 1) << 2)) & 0xF;
 }
 

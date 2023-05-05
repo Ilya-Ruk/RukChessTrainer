@@ -13,7 +13,8 @@
 
 const int NETWORK_MAGIC = 'B' | 'R' << 8 | 'K' << 16 | 'R' << 24;
 
-void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results) {
+void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results)
+{
   // Input biases
 
   memcpy(results->acc[WHITE], nn->inputBiases, sizeof(float) * N_HIDDEN);
@@ -40,7 +41,8 @@ void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results) {
                     nn->outputBias;
 }
 
-NN* LoadNN(char* path) {
+NN* LoadNN(char* path)
+{
   FILE* fp = fopen(path, "rb");
 
   if (fp == NULL) {
@@ -75,7 +77,8 @@ NN* LoadNN(char* path) {
   return nn;
 }
 
-NN* LoadRandomNN(void) {
+NN* LoadRandomNN(void)
+{
   srand(time(NULL));
 
   NN* nn = AlignedMalloc(sizeof(NN));
@@ -97,7 +100,8 @@ NN* LoadRandomNN(void) {
   return nn;
 }
 
-void SaveNN(NN* nn, char* path) {
+void SaveNN(NN* nn, char* path)
+{
   FILE* fp = fopen(path, "wb");
 
   if (fp == NULL) {

@@ -9,7 +9,8 @@
 #include "types.h"
 #include "util.h"
 
-static void LoadDataEntry(char* buffer, Board* result) {
+static void LoadDataEntry(char* buffer, Board* result)
+{
   ParseFen(buffer, result);
 
   result->stm = strstr(buffer, "w ") ? WHITE : BLACK;
@@ -32,7 +33,8 @@ static void LoadDataEntry(char* buffer, Board* result) {
   }
 }
 
-void LoadEntries(char* path, DataSet* data, int n) {
+void LoadEntries(char* path, DataSet* data, int n)
+{
   FILE* fp = fopen(path, "r");
 
   if (fp == NULL) {
@@ -57,7 +59,8 @@ void LoadEntries(char* path, DataSet* data, int n) {
   printf("Loaded positions: %10d\n", p);
 }
 
-void ShuffleData(DataSet* data) {
+void ShuffleData(DataSet* data)
+{
   Board temp;
 
   for (int i = 0; i < data->n; i++) {

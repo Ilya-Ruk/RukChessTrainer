@@ -8,8 +8,9 @@
 
 #define H(h, v) ((h) + (324723947ULL + (v))) ^ 93485734985ULL
 
-INLINE uint64_t NetworkHash(NN* nn) {
-  uint64_t hash = 0;
+INLINE uint64_t NetworkHash(NN* nn)
+{
+  uint64_t hash = 0ULL;
 
   for (int i = 0; i < N_HIDDEN * N_INPUT; i++) {
     hash = H(hash, (int)nn->inputWeights[i]);
@@ -28,7 +29,8 @@ INLINE uint64_t NetworkHash(NN* nn) {
   return hash;
 }
 
-INLINE void ReLU(float* v) {
+INLINE void ReLU(float* v)
+{
   const __m256 zero = _mm256_setzero_ps();
 
   __m256* vector = (__m256*)v;
@@ -38,11 +40,13 @@ INLINE void ReLU(float* v) {
   }
 }
 
-INLINE float ReLUPrime(float s) {
+INLINE float ReLUPrime(float s)
+{
   return s > 0.0f;
 }
 
-INLINE float DotProduct(float* v1, float* v2) {
+INLINE float DotProduct(float* v1, float* v2)
+{
   __m256 s0 = _mm256_setzero_ps();
   __m256 s1 = _mm256_setzero_ps();
 

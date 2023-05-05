@@ -6,7 +6,8 @@
 #include "types.h"
 #include "util.h"
 
-void UpdateAndApplyGradient(float* v, Gradient* grad/*, int Epoch*/) {
+void UpdateAndApplyGradient(float* v, Gradient* grad/*, int Epoch*/)
+{
   if (grad->g == 0.0f) {
     return;
   }
@@ -28,7 +29,8 @@ void UpdateAndApplyGradient(float* v, Gradient* grad/*, int Epoch*/) {
   grad->g = 0.0f;
 }
 
-void ApplyGradients(NN* nn, NNGradients* g/*, int Epoch*/) {
+void ApplyGradients(NN* nn, NNGradients* g/*, int Epoch*/)
+{
 #pragma omp parallel for schedule(auto) num_threads(THREADS)
   for (int i = 0; i < N_INPUT * N_HIDDEN; i++) {
     UpdateAndApplyGradient(&nn->inputWeights[i], &g->inputWeights[i]/*, Epoch*/);
@@ -47,7 +49,8 @@ void ApplyGradients(NN* nn, NNGradients* g/*, int Epoch*/) {
   UpdateAndApplyGradient(&nn->outputBias, &g->outputBias/*, Epoch*/);
 }
 
-void ClearGradients(NNGradients* gradients) {
+void ClearGradients(NNGradients* gradients)
+{
   memset(gradients->inputWeights, 0, sizeof(gradients->inputWeights));
   memset(gradients->inputBiases, 0, sizeof(gradients->inputBiases));
 

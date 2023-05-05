@@ -8,7 +8,8 @@
 #include "bits.h"
 #include "types.h"
 
-void ToFeatures(Board* board, Features* f) {
+void ToFeatures(Board* board, Features* f)
+{
   f->n = 0;
 
   uint64_t bb = board->occupancies;
@@ -24,13 +25,14 @@ void ToFeatures(Board* board, Features* f) {
   }
 }
 
-void ParseFen(char* fen, Board* board) {
+void ParseFen(char* fen, Board* board)
+{
   char* _fen = fen;
   int n = 0;
 
   // Make sure the board is empty
 
-  board->occupancies = 0;
+  board->occupancies = 0ULL;
 
   for (int i = 0; i < 16; i++) {
     board->pieces[i] = 0;
