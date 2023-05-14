@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -13,7 +14,7 @@
 
 const int NETWORK_MAGIC = 'B' | 'R' << 8 | 'K' << 16 | 'R' << 24;
 
-void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results)
+void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results, int train)
 {
   // Input biases
 
@@ -33,6 +34,32 @@ void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results)
 
   ReLU(results->acc[WHITE]);
   ReLU(results->acc[BLACK]);
+
+  // Dropout
+
+#ifdef DROPOUT
+  if (train) {
+    for (int i = 0; i < N_HIDDEN; i++) {
+      float rnd1 = (float)rand() / RAND_MAX;
+
+      if (rnd1 > DROPOUT_P) {
+        results->acc[WHITE][i] /= DROPOUT_Q;
+      }
+      else {
+        results->acc[WHITE][i] = 0.0f;
+      }
+
+      float rnd2 = (float)rand() / RAND_MAX;
+
+      if (rnd2 > DROPOUT_P) {
+        results->acc[BLACK][i] /= DROPOUT_Q;
+      }
+      else {
+        results->acc[BLACK][i] = 0.0f;
+      }
+    }
+  }
+#endif // DROPOUT
 
   // Output
 

@@ -66,7 +66,7 @@ INLINE float DotProduct(float* v1, float* v2)
   return _mm_cvtss_f32(r1);
 }
 
-void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results);
+void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results, int train);
 
 NN* LoadNN(char* path);
 NN* LoadRandomNN(void);

@@ -27,7 +27,7 @@ static float TotalError(DataSet* data, NN* nn)
     NNAccumulators activations[1];
 
     ToFeatures(board, f);
-    NNPredict(nn, f, board->stm, activations);
+    NNPredict(nn, f, board->stm, activations, 0);
 
     e += Error(Sigmoid(activations->output), board);
   }
@@ -52,7 +52,7 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
     NNAccumulators activations[1];
 
     ToFeatures(&board, f);
-    NNPredict(nn, f, board.stm, activations);
+    NNPredict(nn, f, board.stm, activations, 1);
 
     float out = Sigmoid(activations->output);
 
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
       NNAccumulators activations[1];
 
       ToFeatures(&board, f);
-      NNPredict(nn, f, board.stm, activations);
+      NNPredict(nn, f, board.stm, activations, 0);
 
       for (int j = 0; j < 2; j++) { // WHITE, BLACK
         for (int k = 0; k < N_HIDDEN; k++) {
