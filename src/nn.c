@@ -59,6 +59,8 @@ void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results, int trai
       }
     }
   }
+#else
+  (void)train;
 #endif // DROPOUT
 
   // Output

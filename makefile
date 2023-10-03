@@ -1,6 +1,6 @@
 CC = gcc
-SRC = *.c
-EXE = ../bin/trainer
+SRC = src/*.c
+EXE = bin/trainer
 
 LIBS = -lm
 WFLAGS = -std=gnu17 -Wall -Wextra -Wshadow

@@ -26,7 +26,7 @@
 // Dropout
 
 #define DROPOUT
-#define DROPOUT_P 0.05f // 5%
+#define DROPOUT_P 0.5f // 50%
 #define DROPOUT_Q (1.0f - DROPOUT_P)
 
 enum {
