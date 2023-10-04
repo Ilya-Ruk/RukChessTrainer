@@ -4,7 +4,6 @@ Neural networks (NNUE) trainer (based on [Berserk NN Trainer](https://github.com
 # Build
     git clone https://github.com/Ilya-Ruk/RukChessTrainer.git
     cd RukChessTrainer
-    cd src
     make
 
 # Usage
