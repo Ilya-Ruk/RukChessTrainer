@@ -12,15 +12,23 @@ INLINE uint64_t NetworkHash(NN* nn)
 {
   uint64_t hash = 0ULL;
 
-  for (int i = 0; i < N_HIDDEN * N_INPUT; i++) {
+  for (int i = 0; i < N_INPUT * N_HIDDEN_1; i++) {
     hash = H(hash, (int)nn->inputWeights[i]);
   }
 
-  for (int i = 0; i < N_HIDDEN; i++) {
+  for (int i = 0; i < N_HIDDEN_1; i++) {
     hash = H(hash, (int)nn->inputBiases[i]);
   }
 
-  for (int i = 0; i < N_HIDDEN * 2; i++) {
+  for (int i = 0; i < N_HIDDEN_1 * N_HIDDEN_2 * 2; i++) {
+    hash = H(hash, (int)nn->hiddenWeights[i]);
+  }
+
+  for (int i = 0; i < N_HIDDEN_2; i++) {
+    hash = H(hash, (int)nn->hiddenBiases[i]);
+  }
+
+  for (int i = 0; i < N_HIDDEN_2; i++) {
     hash = H(hash, (int)nn->outputWeights[i]);
   }
 
@@ -29,23 +37,24 @@ INLINE uint64_t NetworkHash(NN* nn)
   return hash;
 }
 
-INLINE void ReLU(float* v)
+INLINE void CReLU(float* v, const int regs)
 {
   const __m256 zero = _mm256_setzero_ps();
+  const __m256 max = _mm256_set1_ps(CRELU_MAX);
 
   __m256* vector = (__m256*)v;
 
-  for (int j = 0; j < NUM_REGS; j++) {
-    vector[j] = _mm256_max_ps(zero, vector[j]);
+  for (int j = 0; j < regs; j++) {
+    vector[j] = _mm256_min_ps(max, _mm256_max_ps(zero, vector[j]));
   }
 }
 
-INLINE float ReLUPrime(float s)
+INLINE float CReLUPrime(float s)
 {
-  return s > 0.0f;
+  return s > 0.0f && s < CRELU_MAX;
 }
 
-INLINE float DotProduct(float* v1, float* v2)
+INLINE float DotProduct(float* v1, float* v2, const int regs)
 {
   __m256 s0 = _mm256_setzero_ps();
   __m256 s1 = _mm256_setzero_ps();
@@ -53,7 +62,7 @@ INLINE float DotProduct(float* v1, float* v2)
   __m256* vector1 = (__m256*)v1;
   __m256* vector2 = (__m256*)v2;
 
-  for (int j = 0; j < NUM_REGS; j += 2) {
+  for (int j = 0; j < regs; j += 2) {
     s0 = _mm256_add_ps(_mm256_mul_ps(vector1[j], vector2[j]), s0);
     s1 = _mm256_add_ps(_mm256_mul_ps(vector1[j + 1], vector2[j + 1]), s1);
   }
