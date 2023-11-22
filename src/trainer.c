@@ -272,6 +272,10 @@ int main(int argc, char** argv)
 
   printf("Valid error: %.8f\n\n", validError);
 
+  // Initial learning rate
+
+  LR = ALPHA;
+
   // Train net
 
   for (int epoch = 1; epoch <= 250; epoch++) {
@@ -327,14 +331,18 @@ int main(int argc, char** argv)
 
     long epochEndTime = GetTimeMS();
 
-    printf("Epoch: %3d Valid error: %.8f (%+.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
-           epoch, newValidError, newValidError - validError,
+    printf("Epoch: %3d LR: %.8f Valid error: %.8f (%+.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
+           epoch, LR, newValidError, newValidError - validError,
            (epochEndTime - epochStartTime) / 1000,
            1000.0f * trainData->n / (epochEndTime - epochStartTime));
 
     // Update valid error
 
     validError = newValidError;
+
+    // Update learning rate
+
+    LR *= GAMMA;
   }
 
   return 0;
