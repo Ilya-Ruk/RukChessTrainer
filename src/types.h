@@ -20,8 +20,6 @@
 #define BETA2 0.999f
 #define EPSILON 1e-8f
 
-#define GAMMA 1.0f
-
 #define MAX_VALID_POSITIONS 60000000
 #define MAX_TRAIN_POSITIONS 500000000
 
@@ -105,8 +103,6 @@ typedef struct {
   float inputBiases[N_HIDDEN];
   float inputWeights[N_INPUT * N_HIDDEN];
 } BatchGradients;
-
-extern float LR;
 
 extern const float SS;
 

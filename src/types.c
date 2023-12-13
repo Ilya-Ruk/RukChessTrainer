@@ -1,7 +1,5 @@
 #include "types.h"
 
-float LR;
-
 const float SS = 3.5f / 512;
 
 const Piece opposite[12] = {
