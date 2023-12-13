@@ -23,12 +23,6 @@
 #define MAX_VALID_POSITIONS 60000000
 #define MAX_TRAIN_POSITIONS 500000000
 
-// Dropout
-
-//#define DROPOUT
-//#define DROPOUT_P 0.5f // 50%
-//#define DROPOUT_Q (1.0f - DROPOUT_P)
-
 enum {
   WHITE_PAWN,
   WHITE_KNIGHT,
