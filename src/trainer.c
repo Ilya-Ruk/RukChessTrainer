@@ -46,25 +46,25 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
   for (int n = 0; n < BATCH_SIZE; n++) {
     const int t = omp_get_thread_num();
 
-    Board board = data->entries[n + batch * BATCH_SIZE];
+    Board* board = &data->entries[n + batch * BATCH_SIZE];
 
     Features f[1];
     NNAccumulators activations[1];
 
-    ToFeatures(&board, f);
-    NNPredict(nn, f, board.stm, activations);
+    ToFeatures(board, f);
+    NNPredict(nn, f, board->stm, activations);
 
     float out = Sigmoid(activations->output);
 
     // Loss calculations
 
-    float outputLoss = SigmoidPrime(out) * ErrorPrime(out, &board);
+    float outputLoss = SigmoidPrime(out) * ErrorPrime(out, board);
 
     float hiddenLosses[2][N_HIDDEN];
 
     for (int i = 0; i < N_HIDDEN; i++) {
-      hiddenLosses[board.stm][i] = outputLoss * nn->outputWeights[i] * ReLUPrime(activations->acc[board.stm][i]);
-      hiddenLosses[board.stm ^ 1][i] = outputLoss * nn->outputWeights[i + N_HIDDEN] * ReLUPrime(activations->acc[board.stm ^ 1][i]);
+      hiddenLosses[board->stm][i] = outputLoss * nn->outputWeights[i] * ReLUPrime(activations->acc[board->stm][i]);
+      hiddenLosses[board->stm ^ 1][i] = outputLoss * nn->outputWeights[i + N_HIDDEN] * ReLUPrime(activations->acc[board->stm ^ 1][i]);
     }
 
     // Output layer gradients
@@ -72,20 +72,20 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
     local[t].outputBias += outputLoss;
 
     for (int i = 0; i < N_HIDDEN; i++) {
-      local[t].outputWeights[i] += activations->acc[board.stm][i] * outputLoss;
-      local[t].outputWeights[i + N_HIDDEN] += activations->acc[board.stm ^ 1][i] * outputLoss;
+      local[t].outputWeights[i] += activations->acc[board->stm][i] * outputLoss;
+      local[t].outputWeights[i + N_HIDDEN] += activations->acc[board->stm ^ 1][i] * outputLoss;
     }
 
     // Input layer gradients
 
     for (int i = 0; i < N_HIDDEN; i++) {
-      local[t].inputBiases[i] += hiddenLosses[board.stm][i] + hiddenLosses[board.stm ^ 1][i];
+      local[t].inputBiases[i] += hiddenLosses[board->stm][i] + hiddenLosses[board->stm ^ 1][i];
     }
 
     for (int i = 0; i < f->n; i++) {
       for (int j = 0; j < N_HIDDEN; j++) {
-        local[t].inputWeights[f->features[board.stm][i] * N_HIDDEN + j] += hiddenLosses[board.stm][j];
-        local[t].inputWeights[f->features[board.stm ^ 1][i] * N_HIDDEN + j] += hiddenLosses[board.stm ^ 1][j];
+        local[t].inputWeights[f->features[board->stm][i] * N_HIDDEN + j] += hiddenLosses[board->stm][j];
+        local[t].inputWeights[f->features[board->stm ^ 1][i] * N_HIDDEN + j] += hiddenLosses[board->stm ^ 1][j];
       }
     }
   }
@@ -206,13 +206,13 @@ int main(int argc, char** argv)
     float maxOut = -FLT_MAX;
 
     for (int i = 0; i < validData->n; i++) {
-      Board board = validData->entries[i];
+      Board* board = &validData->entries[i];
 
       Features f[1];
       NNAccumulators activations[1];
 
-      ToFeatures(&board, f);
-      NNPredict(nn, f, board.stm, activations);
+      ToFeatures(board, f);
+      NNPredict(nn, f, board->stm, activations);
 
       for (int j = 0; j < 2; j++) { // WHITE, BLACK
         for (int k = 0; k < N_HIDDEN; k++) {
