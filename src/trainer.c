@@ -296,7 +296,7 @@ int main(int argc, char** argv)
 
       ApplyGradients(nn, gradients/*, epoch*/);
 
-      if (((b + 1) % 1000) == 0) {
+      if ((b + 1) % 1000 == 0) {
         printf("Batch: %5d / %5d\n", b + 1, batches);
       }
     }
