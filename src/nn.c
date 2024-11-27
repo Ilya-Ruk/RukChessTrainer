@@ -46,7 +46,7 @@ NN* LoadNN(char* path)
   FILE* fp = fopen(path, "rb");
 
   if (fp == NULL) {
-    printf("Unable to read network at %s!\n", path);
+    printf("Unable to read network: %s!\n", path);
 
     exit(1);
   }
@@ -56,6 +56,8 @@ NN* LoadNN(char* path)
 
   if (magic != NETWORK_MAGIC) {
     printf("Magic header does not match!\n");
+
+    fclose(fp);
 
     exit(1);
   }
@@ -105,7 +107,7 @@ void SaveNN(NN* nn, char* path)
   FILE* fp = fopen(path, "wb");
 
   if (fp == NULL) {
-    printf("Unable to save network to %s!\n", path);
+    printf("Unable to save network: %s!\n", path);
 
     exit(1);
   }

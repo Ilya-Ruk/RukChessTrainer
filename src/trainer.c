@@ -262,19 +262,30 @@ int main(int argc, char** argv)
 
   BatchGradients* local = malloc(sizeof(BatchGradients) * THREADS);
 
-  // Calculate valid error
+  // Calculate train and valid errors
 
-  printf("Calculating valid error...\n");
+  printf("Calculate train and valid errors...\n");
 
+  float trainError = TotalError(trainData, nn);
   float validError = TotalError(validData, nn);
 
-  printf("Calculating valid error...DONE\n\n");
+  printf("Calculate train and valid errors...DONE\n\n");
 
-  printf("Valid error: %.8f\n\n", validError);
+  // Print train and valid errors
+
+  printf("Train error: %.8f Valid error: %.8f\n\n", trainError, validError);
 
   // Train net
 
-  for (int epoch = 1; epoch <= 250; epoch++) {
+  FILE* fp = fopen("../Nets/train_error_log.txt", "w");
+
+  if (fp == NULL) {
+    printf("Unable to create file: train_error_log.txt!\n");
+
+    exit(1);
+  }
+
+  for (int epoch = 1; epoch <= MAX_EPOCH; epoch++) {
     long epochStartTime = GetTimeMS();
 
     // Shuffle train data
@@ -315,27 +326,39 @@ int main(int argc, char** argv)
 
     printf("Save net...DONE\n\n");
 
-    // Calculate valid error
+    // Calculate train and valid errors
 
-    printf("Calculating valid error...\n");
+    printf("Calculate train and valid errors...\n");
 
+    float newTrainError = TotalError(trainData, nn);
     float newValidError = TotalError(validData, nn);
 
-    printf("Calculating valid error...DONE\n\n");
+    printf("Calculate train and valid errors...DONE\n\n");
 
-    // Print epoch, valid error and delta, time and speed
+    // Print epoch, train and valid errors with delta, time and speed
 
     long epochEndTime = GetTimeMS();
 
-    printf("Epoch: %3d Valid error: %.8f (%+.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
-           epoch, newValidError, newValidError - validError,
+    printf("Epoch: %3d Train error: %.8f (%+.8f) Valid error: %.8f (%+.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
+           epoch,
+           newTrainError, newTrainError - trainError,
+           newValidError, newValidError - validError,
            (epochEndTime - epochStartTime) / 1000,
            1000.0f * trainData->n / (epochEndTime - epochStartTime));
 
-    // Update valid error
+    // Save epoch, train and valid errors
 
+    fprintf(fp, "%d;%.8f;%.8f\n", epoch, newTrainError, newValidError);
+
+    fflush(fp);
+
+    // Update train and valid errors
+
+    trainError = newTrainError;
     validError = newValidError;
   }
+
+  fclose(fp);
 
   return 0;
 }

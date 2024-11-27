@@ -20,8 +20,12 @@
 #define BETA2 0.999f
 #define EPSILON 1e-8f
 
+// Limits
+
 #define MAX_VALID_POSITIONS 100000000
 #define MAX_TRAIN_POSITIONS 500000000
+
+#define MAX_EPOCH 500
 
 enum {
   WHITE_PAWN,

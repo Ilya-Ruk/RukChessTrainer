@@ -57,6 +57,8 @@ void LoadEntries(char* path, DataSet* data, int n)
   data->n = p;
 
   printf("Loaded positions: %10d\n", p);
+
+  fclose(fp);
 }
 
 void ShuffleData(DataSet* data)
