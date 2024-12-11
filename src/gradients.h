@@ -6,47 +6,64 @@
 #include "types.h"
 #include "util.h"
 
-void UpdateAndApplyGradient(float* v, Gradient* grad/*, int epoch*/)
+static void UpdateAndApplyGradientWithEpoch(float* v, Gradient* grad, float g, int epoch)
 {
-  if (grad->g == 0.0f) {
-    return;
-  }
+  grad->M = BETA1 * grad->M + (1.0f - BETA1) * g;
+  grad->V = BETA2 * grad->V + (1.0f - BETA2) * g * g;
 
-  // Adam
+  float M_Corrected = grad->M / (1.0f - powf(BETA1, epoch));
+  float V_Corrected = grad->V / (1.0f - powf(BETA2, epoch));
 
-  grad->M = BETA1 * grad->M + (1.0f - BETA1) * grad->g;
-  grad->V = BETA2 * grad->V + (1.0f - BETA2) * grad->g * grad->g;
-
-  float delta = ALPHA * grad->M / (sqrtf(grad->V) + EPSILON);
-
-//  float M_Corrected = grad->M / (1.0f - powf(BETA1, epoch));
-//  float V_Corrected = grad->V / (1.0f - powf(BETA2, epoch));
-
-//  float delta = ALPHA * M_Corrected / (sqrtf(V_Corrected) + EPSILON);
-
-  *v -= delta;
-
-  grad->g = 0.0f;
+  *v -= ALPHA * M_Corrected / (sqrtf(V_Corrected) + EPSILON);
 }
 
-void ApplyGradients(NN* nn, NNGradients* g/*, int epoch*/)
+void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local, int epoch)
 {
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
-  for (int i = 0; i < N_INPUT * N_HIDDEN; i++) {
-    UpdateAndApplyGradient(&nn->inputWeights[i], &g->inputWeights[i]/*, epoch*/);
+#pragma omp parallel for schedule(static) num_threads(THREADS)
+  for (int i = 0; i < N_INPUT; i++) {
+    for (int j = 0; j < N_HIDDEN; j++) {
+      int idx = i * N_HIDDEN + j;
+
+      float g = 0.0f;
+
+      for (int t = 0; t < THREADS; t++) {
+        g += local[t].inputWeights[idx];
+      }
+
+      UpdateAndApplyGradientWithEpoch(&nn->inputWeights[idx], &gradients->inputWeights[idx], g, epoch);
+    }
   }
 
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
+#pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int i = 0; i < N_HIDDEN; i++) {
-    UpdateAndApplyGradient(&nn->inputBiases[i], &g->inputBiases[i]/*, epoch*/);
+    float g = 0.0f;
+
+    for (int t = 0; t < THREADS; t++) {
+      g += local[t].inputBiases[i];
+    }
+
+    UpdateAndApplyGradientWithEpoch(&nn->inputBiases[i], &gradients->inputBiases[i], g, epoch);
   }
 
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
+#pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int i = 0; i < N_HIDDEN * 2; i++) {
-    UpdateAndApplyGradient(&nn->outputWeights[i], &g->outputWeights[i]/*, epoch*/);
+    float g = 0.0f;
+
+    for (int t = 0; t < THREADS; t++) {
+      g += local[t].outputWeights[i];
+    }
+
+    UpdateAndApplyGradientWithEpoch(&nn->outputWeights[i], &gradients->outputWeights[i], g, epoch);
   }
 
-  UpdateAndApplyGradient(&nn->outputBias, &g->outputBias/*, epoch*/);
+  float g = 0.0f;
+
+#pragma omp parallel for schedule(static) num_threads(THREADS)
+  for (int t = 0; t < THREADS; t++) {
+    g += local[t].outputBias;
+  }
+
+  UpdateAndApplyGradientWithEpoch(&nn->outputBias, &gradients->outputBias, g, epoch);
 }
 
 void ClearGradients(NNGradients* gradients)

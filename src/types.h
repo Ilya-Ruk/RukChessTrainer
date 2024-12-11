@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define N_INPUT 768
-#define N_HIDDEN 512
+#define N_HIDDEN 256
 #define N_OUTPUT 1
 
 #define THREADS 12
@@ -15,7 +15,7 @@
 
 // Adam
 
-#define ALPHA 0.002f
+#define ALPHA 0.01f
 #define BETA1 0.9f
 #define BETA2 0.999f
 #define EPSILON 1e-8f
@@ -83,7 +83,7 @@ typedef struct {
 } __attribute__((aligned(64))) NNAccumulators;
 
 typedef struct {
-  float g, M, V;
+  float M, V;
 } Gradient;
 
 typedef struct {

@@ -19,7 +19,7 @@ static float TotalError(DataSet* data, NN* nn)
 {
   float e = 0.0f;
 
-#pragma omp parallel for schedule(auto) num_threads(THREADS) reduction(+ : e)
+#pragma omp parallel for schedule(static) num_threads(THREADS) reduction(+ : e)
   for (int i = 0; i < data->n; i++) {
     Board* board = &data->entries[i];
 
@@ -35,14 +35,14 @@ static float TotalError(DataSet* data, NN* nn)
   return e / data->n;
 }
 
-static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradients* local)
+static void Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
 {
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
+#pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int t = 0; t < THREADS; t++) {
     memset(&local[t], 0, sizeof(BatchGradients));
   }
 
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
+#pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int n = 0; n < BATCH_SIZE; n++) {
     const int t = omp_get_thread_num();
 
@@ -83,36 +83,14 @@ static void Train(int batch, DataSet* data, NN* nn, NNGradients* g, BatchGradien
     }
 
     for (int i = 0; i < f->n; i++) {
+      int f1 = f->features[board->stm][i];
+      int f2 = f->features[board->stm ^ 1][i];
+
       for (int j = 0; j < N_HIDDEN; j++) {
-        local[t].inputWeights[f->features[board->stm][i] * N_HIDDEN + j] += hiddenLosses[board->stm][j];
-        local[t].inputWeights[f->features[board->stm ^ 1][i] * N_HIDDEN + j] += hiddenLosses[board->stm ^ 1][j];
+        local[t].inputWeights[f1 * N_HIDDEN + j] += hiddenLosses[board->stm][j];
+        local[t].inputWeights[f2 * N_HIDDEN + j] += hiddenLosses[board->stm ^ 1][j];
       }
     }
-  }
-
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
-  for (int i = 0; i < N_INPUT * N_HIDDEN; i++) {
-    for (int t = 0; t < THREADS; t++) {
-      g->inputWeights[i].g += local[t].inputWeights[i];
-    }
-  }
-
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
-  for (int i = 0; i < N_HIDDEN; i++) {
-    for (int t = 0; t < THREADS; t++) {
-      g->inputBiases[i].g += local[t].inputBiases[i];
-    }
-  }
-
-#pragma omp parallel for schedule(auto) num_threads(THREADS)
-  for (int i = 0; i < N_HIDDEN * 2; i++) {
-    for (int t = 0; t < THREADS; t++) {
-      g->outputWeights[i].g += local[t].outputWeights[i];
-    }
-  }
-
-  for (int t = 0; t < THREADS; t++) {
-    g->outputBias.g += local[t].outputBias;
   }
 }
 
@@ -214,13 +192,16 @@ int main(int argc, char** argv)
       ToFeatures(board, f);
       NNPredict(nn, f, board->stm, activations);
 
-      for (int j = 0; j < 2; j++) { // WHITE, BLACK
-        for (int k = 0; k < N_HIDDEN; k++) {
-          float acc = activations->acc[j][k];
+      for (int j = 0; j < N_HIDDEN; j++) {
+        float acc0 = activations->acc[WHITE][j];
+        float acc1 = activations->acc[BLACK][j];
 
-          if (acc > maxAcc) {
-            maxAcc = acc;
-          }
+        if (acc0 > maxAcc) {
+          maxAcc = acc0;
+        }
+
+        if (acc1 > maxAcc) {
+          maxAcc = acc1;
         }
       }
 
@@ -303,9 +284,9 @@ int main(int argc, char** argv)
     int batches = trainData->n / BATCH_SIZE;
 
     for (int b = 0; b < batches; b++) {
-      Train(b, trainData, nn, gradients, local);
+      Train(b, trainData, nn, local);
 
-      ApplyGradients(nn, gradients/*, epoch*/);
+      ApplyGradients(nn, gradients, local, epoch);
 
       if ((b + 1) % 1000 == 0) {
         printf("Batch: %5d / %5d\n", b + 1, batches);
