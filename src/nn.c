@@ -65,7 +65,7 @@ NN* LoadNN(char* path)
   uint64_t hash;
   fread(&hash, sizeof(uint64_t), 1, fp);
 
-  printf("Reading network with hash %lx\n", hash);
+  printf("Reading network with hash %llx\n", hash);
 
   NN* nn = AlignedMalloc(sizeof(NN));
 

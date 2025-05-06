@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define N_INPUT 768
-#define N_HIDDEN 256
+#define N_HIDDEN 512
 #define N_OUTPUT 1
 
 #define THREADS 12
@@ -15,17 +15,17 @@
 
 // Adam
 
-#define ALPHA 0.01f
+#define ALPHA 0.002f
 #define BETA1 0.9f
 #define BETA2 0.999f
 #define EPSILON 1e-8f
 
 // Limits
 
-#define MAX_VALID_POSITIONS 100000000
-#define MAX_TRAIN_POSITIONS 500000000
+#define MAX_VALID_POSITIONS 10000000
+#define MAX_TRAIN_POSITIONS 450000000
 
-#define MAX_EPOCH 500
+#define MAX_EPOCHS 500
 
 enum {
   WHITE_PAWN,

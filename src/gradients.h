@@ -6,18 +6,19 @@
 #include "types.h"
 #include "util.h"
 
-static void UpdateAndApplyGradientWithEpoch(float* v, Gradient* grad, float g, int epoch)
+static void UpdateAndApplyGradient(float* v, Gradient* grad, float g)
 {
+  if (g == 0.0f) {
+    return;
+  }
+
   grad->M = BETA1 * grad->M + (1.0f - BETA1) * g;
   grad->V = BETA2 * grad->V + (1.0f - BETA2) * g * g;
 
-  float M_Corrected = grad->M / (1.0f - powf(BETA1, epoch));
-  float V_Corrected = grad->V / (1.0f - powf(BETA2, epoch));
-
-  *v -= ALPHA * M_Corrected / (sqrtf(V_Corrected) + EPSILON);
+  *v -= ALPHA * grad->M / (sqrtf(grad->V) + EPSILON);
 }
 
-void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local, int epoch)
+void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local)
 {
 #pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int i = 0; i < N_INPUT; i++) {
@@ -30,7 +31,7 @@ void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local, int e
         g += local[t].inputWeights[idx];
       }
 
-      UpdateAndApplyGradientWithEpoch(&nn->inputWeights[idx], &gradients->inputWeights[idx], g, epoch);
+      UpdateAndApplyGradient(&nn->inputWeights[idx], &gradients->inputWeights[idx], g);
     }
   }
 
@@ -42,7 +43,7 @@ void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local, int e
       g += local[t].inputBiases[i];
     }
 
-    UpdateAndApplyGradientWithEpoch(&nn->inputBiases[i], &gradients->inputBiases[i], g, epoch);
+    UpdateAndApplyGradient(&nn->inputBiases[i], &gradients->inputBiases[i], g);
   }
 
 #pragma omp parallel for schedule(static) num_threads(THREADS)
@@ -53,7 +54,7 @@ void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local, int e
       g += local[t].outputWeights[i];
     }
 
-    UpdateAndApplyGradientWithEpoch(&nn->outputWeights[i], &gradients->outputWeights[i], g, epoch);
+    UpdateAndApplyGradient(&nn->outputWeights[i], &gradients->outputWeights[i], g);
   }
 
   float g = 0.0f;
@@ -63,7 +64,7 @@ void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local, int e
     g += local[t].outputBias;
   }
 
-  UpdateAndApplyGradientWithEpoch(&nn->outputBias, &gradients->outputBias, g, epoch);
+  UpdateAndApplyGradient(&nn->outputBias, &gradients->outputBias, g);
 }
 
 void ClearGradients(NNGradients* gradients)

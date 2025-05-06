@@ -29,20 +29,24 @@ static float TotalError(DataSet* data, NN* nn)
     ToFeatures(board, f);
     NNPredict(nn, f, board->stm, activations);
 
-    e += Error(Sigmoid(activations->output), board);
+    float out = Sigmoid(activations->output);
+
+    e += Error(out, board);
   }
 
   return e / data->n;
 }
 
-static void Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
+static float Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
 {
 #pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int t = 0; t < THREADS; t++) {
     memset(&local[t], 0, sizeof(BatchGradients));
   }
 
-#pragma omp parallel for schedule(static) num_threads(THREADS)
+  float e = 0.0f;
+
+#pragma omp parallel for schedule(static) num_threads(THREADS) reduction(+ : e)
   for (int n = 0; n < BATCH_SIZE; n++) {
     const int t = omp_get_thread_num();
 
@@ -55,6 +59,8 @@ static void Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
     NNPredict(nn, f, board->stm, activations);
 
     float out = Sigmoid(activations->output);
+
+    e += Error(out, board);
 
     // Loss calculations
 
@@ -92,6 +98,8 @@ static void Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
       }
     }
   }
+
+  return e / BATCH_SIZE;
 }
 
 int main(int argc, char** argv)
@@ -266,7 +274,7 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-  for (int epoch = 1; epoch <= MAX_EPOCH; epoch++) {
+  for (int epoch = 1; epoch <= MAX_EPOCHS; epoch++) {
     long epochStartTime = GetTimeMS();
 
     // Shuffle train data
@@ -283,15 +291,19 @@ int main(int argc, char** argv)
 
     int batches = trainData->n / BATCH_SIZE;
 
-    for (int b = 0; b < batches; b++) {
-      Train(b, trainData, nn, local);
+    float newTrainError = 0.0f;
 
-      ApplyGradients(nn, gradients, local, epoch);
+    for (int b = 0; b < batches; b++) {
+      newTrainError += Train(b, trainData, nn, local);
+
+      ApplyGradients(nn, gradients, local);
 
       if ((b + 1) % 1000 == 0) {
         printf("Batch: %5d / %5d\n", b + 1, batches);
       }
     }
+
+    newTrainError /= batches;
 
     printf("Train net...DONE\n\n");
 
@@ -307,14 +319,13 @@ int main(int argc, char** argv)
 
     printf("Save net...DONE\n\n");
 
-    // Calculate train and valid errors
+    // Calculate valid error
 
-    printf("Calculate train and valid errors...\n");
+    printf("Calculate valid error...\n");
 
-    float newTrainError = TotalError(trainData, nn);
     float newValidError = TotalError(validData, nn);
 
-    printf("Calculate train and valid errors...DONE\n\n");
+    printf("Calculate valid error...DONE\n\n");
 
     // Print epoch, train and valid errors with delta, time and speed
 
