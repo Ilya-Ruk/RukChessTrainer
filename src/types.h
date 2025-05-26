@@ -15,15 +15,15 @@
 
 // Adam
 
-#define ALPHA 0.002f
+#define ALPHA 0.001f
 #define BETA1 0.9f
 #define BETA2 0.999f
 #define EPSILON 1e-8f
 
 // Limits
 
-#define MAX_VALID_POSITIONS 10000000
-#define MAX_TRAIN_POSITIONS 450000000
+#define MAX_VALID_POSITIONS 20000000
+#define MAX_TRAIN_POSITIONS 800000000
 
 #define MAX_EPOCHS 500
 
