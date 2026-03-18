@@ -59,7 +59,6 @@ void ApplyGradients(NN* nn, NNGradients* gradients, BatchGradients* local)
 
   float g = 0.0f;
 
-#pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int t = 0; t < THREADS; t++) {
     g += local[t].outputBias;
   }
