@@ -5,27 +5,32 @@
 #include <stdbool.h>
 
 #define N_INPUT 768
-#define N_HIDDEN 512
+#define N_HIDDEN 128
 #define N_OUTPUT 1
 
-#define THREADS 12
+#define THREADS 16
 #define BATCH_SIZE 16384
 
-#define NUM_REGS (N_HIDDEN * (int)sizeof(float) / (int)sizeof(__m256)) // 64
+#define NUM_REGS (N_HIDDEN * (int)sizeof(float) / (int)sizeof(__m256))
 
-// Adam
+// Adam (AMSGrad)
 
-#define ALPHA 0.001f
+#define ALPHA 0.002f
 #define BETA1 0.9f
 #define BETA2 0.999f
 #define EPSILON 1e-8f
 
 // Limits
 
-#define MAX_VALID_POSITIONS 20000000
-#define MAX_TRAIN_POSITIONS 800000000
+#define MAX_VALID_POSITIONS 15000000
+#define MAX_TRAIN_POSITIONS 275000000
 
 #define MAX_EPOCHS 500
+
+// Learning rate scheduler
+
+#define VIRTUAL_EPOCH_SIZE 3000 // 49152000 positions
+#define LR_DECAY 0.99692f
 
 enum {
   WHITE_PAWN,
@@ -83,7 +88,7 @@ typedef struct {
 } __attribute__((aligned(64))) NNAccumulators;
 
 typedef struct {
-  float M, V;
+  float M, V, Vmax;
 } Gradient;
 
 typedef struct {
@@ -102,8 +107,8 @@ typedef struct {
   float inputWeights[N_INPUT * N_HIDDEN];
 } BatchGradients;
 
-extern const float SS;
-
 extern const Piece opposite[12];
+
+extern float alpha;
 
 #endif

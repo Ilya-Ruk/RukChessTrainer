@@ -18,12 +18,12 @@ INLINE float ErrorPrime(float r, Board* b)
 
 INLINE float Sigmoid(float s)
 {
-  return 1.0f / (1.0f + expf(-s * SS));
+  return 1.0f / (1.0f + expf(-s));
 }
 
 INLINE float SigmoidPrime(float s)
 {
-  return s * (1.0f - s) * SS;
+  return s * (1.0f - s);
 }
 
 #endif

@@ -29,10 +29,10 @@ void NNPredict(NN* nn, Features* f, Color stm, NNAccumulators* results)
     }
   }
 
-  // ReLU
+  // CReLU
 
-  ReLU(results->acc[WHITE]);
-  ReLU(results->acc[BLACK]);
+  CReLU(results->acc[WHITE]);
+  CReLU(results->acc[BLACK]);
 
   // Output
 

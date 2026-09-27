@@ -37,14 +37,16 @@ static float TotalError(DataSet* data, NN* nn)
   return e / data->n;
 }
 
-static float Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
+static float Train(int batch, DataSet* data, NN* nn, BatchGradients* local, uint8_t* active)
 {
+  float e = 0.0f;
+
+  uint8_t actives[THREADS][N_INPUT] = {0};
+
 #pragma omp parallel for schedule(static) num_threads(THREADS)
   for (int t = 0; t < THREADS; t++) {
     memset(&local[t], 0, sizeof(BatchGradients));
   }
-
-  float e = 0.0f;
 
 #pragma omp parallel for schedule(static) num_threads(THREADS) reduction(+ : e)
   for (int n = 0; n < BATCH_SIZE; n++) {
@@ -69,8 +71,8 @@ static float Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
     float hiddenLosses[2][N_HIDDEN];
 
     for (int i = 0; i < N_HIDDEN; i++) {
-      hiddenLosses[board->stm][i] = outputLoss * nn->outputWeights[i] * ReLUPrime(activations->acc[board->stm][i]);
-      hiddenLosses[board->stm ^ 1][i] = outputLoss * nn->outputWeights[i + N_HIDDEN] * ReLUPrime(activations->acc[board->stm ^ 1][i]);
+      hiddenLosses[board->stm][i] = outputLoss * nn->outputWeights[i] * CReLUPrime(activations->acc[board->stm][i]);
+      hiddenLosses[board->stm ^ 1][i] = outputLoss * nn->outputWeights[i + N_HIDDEN] * CReLUPrime(activations->acc[board->stm ^ 1][i]);
     }
 
     // Output layer gradients
@@ -92,10 +94,19 @@ static float Train(int batch, DataSet* data, NN* nn, BatchGradients* local)
       int f1 = f->features[board->stm][i];
       int f2 = f->features[board->stm ^ 1][i];
 
+      actives[t][f1] = 1;
+      actives[t][f2] = 1;
+
       for (int j = 0; j < N_HIDDEN; j++) {
         local[t].inputWeights[f1 * N_HIDDEN + j] += hiddenLosses[board->stm][j];
         local[t].inputWeights[f2 * N_HIDDEN + j] += hiddenLosses[board->stm ^ 1][j];
       }
+    }
+  }
+
+  for (int t = 0; t < THREADS; t++) {
+    for (int i = 0; i < N_INPUT; i++) {
+      active[i] |= actives[t][i];
     }
   }
 
@@ -251,6 +262,16 @@ int main(int argc, char** argv)
 
   BatchGradients* local = malloc(sizeof(BatchGradients) * THREADS);
 
+  // Prepare train error log file
+
+  FILE* fp = fopen("../Nets/train_error_log.txt", "w");
+
+  if (fp == NULL) {
+    printf("Unable to create file: train_error_log.txt!\n");
+
+    exit(1);
+  }
+
   // Calculate train and valid errors
 
   printf("Calculate train and valid errors...\n");
@@ -266,13 +287,9 @@ int main(int argc, char** argv)
 
   // Train net
 
-  FILE* fp = fopen("../Nets/train_error_log.txt", "w");
+  int step = 1;
 
-  if (fp == NULL) {
-    printf("Unable to create file: train_error_log.txt!\n");
-
-    exit(1);
-  }
+  alpha = ALPHA;
 
   for (int epoch = 1; epoch <= MAX_EPOCHS; epoch++) {
     long epochStartTime = GetTimeMS();
@@ -294,13 +311,23 @@ int main(int argc, char** argv)
     float newTrainError = 0.0f;
 
     for (int b = 0; b < batches; b++) {
-      newTrainError += Train(b, trainData, nn, local);
+      uint8_t active[N_INPUT] = {0};
 
-      ApplyGradients(nn, gradients, local);
+      newTrainError += Train(b, trainData, nn, local, active);
+
+      ApplyGradients(nn, gradients, local, active, step);
 
       if ((b + 1) % 1000 == 0) {
         printf("Batch: %5d / %5d\n", b + 1, batches);
       }
+
+      // Learning rate update
+
+      if (step % VIRTUAL_EPOCH_SIZE == 0) {
+          alpha *= LR_DECAY;
+      }
+
+      step++;
     }
 
     newTrainError /= batches;
@@ -327,15 +354,18 @@ int main(int argc, char** argv)
 
     printf("Calculate valid error...DONE\n\n");
 
-    // Print epoch, train and valid errors with delta, time and speed
+    // Print epoch, alpha, train and valid errors with delta, time and speed
 
     long epochEndTime = GetTimeMS();
 
-    printf("Epoch: %3d Train error: %.8f (%+.8f) Valid error: %.8f (%+.8f) Time: %ld sec Speed: %7.0f pos/sec\n\n",
+    printf("Epoch %3d Alpha %.8f Train error %.8f (%+.8f) Valid error %.8f (%+.8f) Time %ld sec. Speed %7.0f pos./sec.\n\n",
            epoch,
-           newTrainError, newTrainError - trainError,
-           newValidError, newValidError - validError,
-           (epochEndTime - epochStartTime) / 1000,
+           alpha,
+           newTrainError,
+           newTrainError - trainError,
+           newValidError,
+           newValidError - validError,
+           (epochEndTime - epochStartTime) / 1000L,
            1000.0f * trainData->n / (epochEndTime - epochStartTime));
 
     // Save epoch, train and valid errors

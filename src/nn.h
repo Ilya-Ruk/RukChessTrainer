@@ -29,20 +29,21 @@ INLINE uint64_t NetworkHash(NN* nn)
   return hash;
 }
 
-INLINE void ReLU(float* v)
+INLINE void CReLU(float* v)
 {
   const __m256 zero = _mm256_setzero_ps();
+  const __m256 one = _mm256_set1_ps(1.0f);
 
   __m256* vector = (__m256*)v;
 
   for (int j = 0; j < NUM_REGS; j++) {
-    vector[j] = _mm256_max_ps(zero, vector[j]);
+    vector[j] = _mm256_min_ps(_mm256_max_ps(zero, vector[j]), one);
   }
 }
 
-INLINE float ReLUPrime(float s)
+INLINE float CReLUPrime(float s)
 {
-  return s > 0.0f;
+  return s > 0.0f && s < 1.0f;
 }
 
 INLINE float DotProduct(float* v1, float* v2)
